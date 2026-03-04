@@ -1010,6 +1010,28 @@
       padding: 12px 0 0; font-size: 22px;
       filter: saturate(1.2);
     }
+    /* ─── Language Selector ───────────────────────────── */
+    .lang-selector {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; padding: 16px 24px 4px;
+    }
+    .lang-selector-label {
+      font-size: 11px; font-weight: 900; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--label-3);
+    }
+    .lang-btn {
+      padding: 8px 18px; border-radius: 100px;
+      border: 2px solid var(--border); border-bottom: 3px solid var(--border-deep);
+      background: var(--card); font-size: 14px; font-weight: 700;
+      color: var(--label-2); cursor: pointer; font-family: inherit;
+      transition: border-color 0.15s, background 0.15s, color 0.15s, transform 0.1s;
+      -webkit-user-select: none; user-select: none;
+    }
+    .lang-btn:active { transform: translateY(2px); }
+    .lang-btn.active {
+      border-color: var(--blue-dark); background: var(--blue-light);
+      color: var(--blue-dark); border-bottom-color: var(--blue-dark);
+    }
   </style>
 </head>
 <body>
@@ -1034,25 +1056,25 @@
         <div class="hero-floaties">
           <span>🎤</span><span>🎭</span><span>😬</span><span>✨</span><span>💬</span>
         </div>
-        <h1 class="home-title">How Not To Be Awkward</h1>
-        <p class="home-subtitle">AI-powered ice breakers &amp; jokes, crafted for your exact situation.</p>
+        <h1 class="home-title" id="homeTitle">How Not To Be Awkward</h1>
+        <p class="home-subtitle" id="homeSubtitle">AI-powered ice breakers &amp; jokes, crafted for your exact situation.</p>
       </div>
 
-      <p class="section-label">Choose Your Setting</p>
+      <p class="section-label" id="chooseSetting">Choose Your Setting</p>
       <div class="mode-cards">
         <button class="mode-card" onclick="selectMode('work')">
           <div class="mode-icon-wrap work">💼</div>
           <div class="mode-info">
-            <div class="mode-name">Work</div>
-            <div class="mode-desc">Meetings, presentations, onboarding &amp; professional events</div>
+            <div class="mode-name" id="workModeName">Work</div>
+            <div class="mode-desc" id="workModeDesc">Meetings, presentations, onboarding &amp; professional events</div>
           </div>
           <span class="mode-arrow">›</span>
         </button>
         <button class="mode-card" onclick="selectMode('lifestyle')">
           <div class="mode-icon-wrap lifestyle">🎉</div>
           <div class="mode-info">
-            <div class="mode-name">Lifestyle</div>
-            <div class="mode-desc">Parties, dates, social gatherings &amp; new friendships</div>
+            <div class="mode-name" id="lifestyleModeName">Lifestyle</div>
+            <div class="mode-desc" id="lifestyleModeDesc">Parties, dates, social gatherings &amp; new friendships</div>
           </div>
           <span class="mode-arrow">›</span>
         </button>
@@ -1062,23 +1084,29 @@
         <div class="how-step">
           <span class="how-step-emoji">📝</span>
           <span class="how-step-num">1</span>
-          <span class="how-step-label">Describe your situation</span>
+          <span class="how-step-label" id="howStep1">Describe your situation</span>
         </div>
         <span class="how-step-arrow">→</span>
         <div class="how-step">
           <span class="how-step-emoji">🤔</span>
           <span class="how-step-num">2</span>
-          <span class="how-step-label">Quick personality quiz</span>
+          <span class="how-step-label" id="howStep2">Quick personality quiz</span>
         </div>
         <span class="how-step-arrow">→</span>
         <div class="how-step">
           <span class="how-step-emoji">🎯</span>
           <span class="how-step-num">3</span>
-          <span class="how-step-label">Get killer lines</span>
+          <span class="how-step-label" id="howStep3">Get killer lines</span>
         </div>
       </div>
 
-      <p class="home-disclaimer">
+      <div class="lang-selector">
+        <span class="lang-selector-label">Language</span>
+        <button class="lang-btn active" id="langBtnEn" onclick="selectLanguage('en')">🇺🇸 English</button>
+        <button class="lang-btn" id="langBtnZh" onclick="selectLanguage('zh')">🇨🇳 中文</button>
+      </div>
+
+      <p class="home-disclaimer" id="homeDisclaimer">
         All content is AI-generated · We never store personal info
       </p>
     </div>
@@ -1091,16 +1119,16 @@
 
         <div class="mode-badge-row">
           <span class="mode-badge" id="inputModeBadge"></span>
-          <span class="mode-badge-sub">Describe your situation</span>
+          <span class="mode-badge-sub" id="inputModeBadgeSub">Describe your situation</span>
         </div>
 
         <div class="input-tip-banner">
           <span class="input-tip-emoji">💡</span>
-          <span class="input-tip-text">More detail = way better suggestions. Be specific!</span>
+          <span class="input-tip-text" id="inputTipText">More detail = way better suggestions. Be specific!</span>
         </div>
 
         <div class="form-section">
-          <div class="form-section-header">Your Situation</div>
+          <div class="form-section-header" id="situationHeader">Your Situation</div>
           <div class="form-group">
             <textarea
               id="contextInput"
@@ -1144,8 +1172,8 @@
 
         <div class="questions-intro">
           <span class="questions-mascot">🧠</span>
-          <div class="questions-intro-title">Tell us a bit more</div>
-          <div class="questions-intro-sub">
+          <div class="questions-intro-title" id="questionsIntroTitle">Tell us a bit more</div>
+          <div class="questions-intro-sub" id="questionsIntroSub">
             A few quick taps will help us craft perfectly tailored suggestions.
           </div>
         </div>
@@ -1158,7 +1186,7 @@
         </button>
 
         <div class="questions-skip" id="questionsSkip" style="display:none">
-          <button onclick="generateFromAnswers()">Skip &amp; generate anyway</button>
+          <button id="questionsSkipBtn" onclick="generateFromAnswers()">Skip &amp; generate anyway</button>
         </div>
 
       </div>
@@ -1176,7 +1204,7 @@
         <!-- ── Controls (shown after generation) ── -->
         <div id="resultsControls" style="display:none">
           <div class="controls-block">
-            <div class="controls-label">Tone</div>
+            <div class="controls-label" id="toneLabel">Tone</div>
             <div class="pills-row">
               <button class="style-pill" data-style="formal"  onclick="setStyle('formal')" >🎩 Formal</button>
               <button class="style-pill active" data-style="neutral" onclick="setStyle('neutral')">⚖️ Balanced</button>
@@ -1184,7 +1212,7 @@
             </div>
           </div>
           <div class="controls-block">
-            <div class="controls-label">Humor Style</div>
+            <div class="controls-label" id="humorLabel">Humor Style</div>
             <div class="pills-row">
               <button class="humor-pill active" data-humor="balanced"        onclick="setHumor('balanced')"       >😊 Balanced</button>
               <button class="humor-pill" data-humor="dry"             onclick="setHumor('dry')"           >🧊 Dry</button>
@@ -1241,6 +1269,7 @@
 // ─── State ───────────────────────────────────────────────────────────
 const state = {
   currentView: 'mode',
+  language: 'en',
   history: [],
   setting: null,
   style: 'neutral',
@@ -1254,6 +1283,182 @@ const state = {
   feedbacks: {},
   reportTarget: null,
 };
+
+// ─── UI Strings (EN / ZH) ────────────────────────────────────
+const STRINGS = {
+  en: {
+    ibTitle: 'Ice Breakers', ibSub: 'Kick off the conversation',
+    jokTitle: 'Jokes',       jokSub: 'Get the laughs rolling',
+    loadingTitle: 'Cooking up your lines…',
+    loadingSub: 'AI is working its magic ✨',
+    bannerTitle: "You’ve got lines!",
+    bannerSub: (ib, j) => `${ib} ice breakers · ${j} jokes — go crush it 💪`,
+    questionsTitle: 'Tell us a bit more',
+    questionsSub: 'A few quick taps will help us craft perfectly tailored suggestions.',
+    generateBtn: '✨ Generate Suggestions',
+    skipBtn: 'Skip & generate anyway',
+    homeTitle: 'How Not To Be Awkward',
+    homeSubtitle: 'AI-powered ice breakers & jokes, crafted for your exact situation.',
+    chooseSetting: 'Choose Your Setting',
+    workName: 'Work',
+    workDesc: 'Meetings, presentations, onboarding & professional events',
+    lifestyleName: 'Lifestyle',
+    lifestyleDesc: 'Parties, dates, social gatherings & new friendships',
+    howStep1: 'Describe your situation',
+    howStep2: 'Quick personality quiz',
+    howStep3: 'Get killer lines',
+    homeDisclaimer: 'All content is AI-generated · We never store personal info',
+    inputSubtitle: 'Describe your situation',
+    tipText: 'More detail = way better suggestions. Be specific!',
+    situationHeader: 'Your Situation',
+    placeholder: 'e.g. “Starting a Q2 all-hands with 60 engineers who just shipped a big release.”',
+    continueBtn: 'Continue →',
+    contentHint: 'Safe & appropriate content · English only',
+    toneLabel: 'Tone',
+    humorLabel: 'Humor Style',
+    regenBtn: '↺ Regenerate',
+    aiDisclaimer: '🤖 AI-generated content · Review before sharing',
+    styleFormal: '🎩 Formal',
+    styleBalanced: '⚖️ Balanced',
+    styleCasual: '😊 Casual',
+    humorBalanced: '😊 Balanced',
+    humorDry: '🧊 Dry',
+    humorDad: '👨 Dad Joke',
+    humorSarcastic: '😏 Sarcastic',
+    humorDark: '🌑 Dark',
+    humorSelfDep: '🙈 Self-Deprecating',
+    humorWordplay: '🔤 Wordplay & Puns',
+    humorOneLiners: '⚡ Witty One-Liners',
+    humorMisdirect: '🪄 Misdirect',
+    humorPop: '🌐 Pop / Current Events',
+    navHome: 'Home',
+    navWork: 'Work', navLifestyle: 'Lifestyle',
+    navPersonalize: 'Personalize', navResults: 'Your Suggestions',
+    badgeWork: '💼 Work', badgeLifestyle: '🎉 Lifestyle',
+  },
+  zh: {
+    ibTitle: '开场白', ibSub: '打破沉默，轻松开聊',
+    jokTitle: '段子',     jokSub: '整活，制造笑点',
+    loadingTitle: '正在生成你的台词…',
+    loadingSub: 'AI正在施展魔法 ✨',
+    bannerTitle: '你的台词来了！',
+    bannerSub: (ib, j) => `${ib} 条开场白 · ${j} 个段子 — 去整活吧 💪`,
+    questionsTitle: '再告诉我们一点',
+    questionsSub: '几个简单的选择，帮我们为你量身定制更地道的内容。',
+    generateBtn: '✨ 生成推荐',
+    skipBtn: '跳过，直接生成',
+    homeTitle: '告别社恐',
+    homeSubtitle: 'AI 生成专属开场白和段子，针对你的具体场景量身定制。',
+    chooseSetting: '选择你的场景',
+    workName: '职场',
+    workDesc: '会议、演讲、入职培训及职业社交活动',
+    lifestyleName: '生活',
+    lifestyleDesc: '派对、约会、社交聚会及结交新朋友',
+    howStep1: '描述你的场景',
+    howStep2: '简单个性测试',
+    howStep3: '获取神级台词',
+    homeDisclaimer: '内容由 AI 生成 · 我们从不储存个人信息',
+    inputSubtitle: '描述你的场景',
+    tipText: '描述越详细，推荐越精准。说具体点！',
+    situationHeader: '你的场景',
+    placeholder: '例如：“公司年终出游，60个同事，不够熟，需要打开话匙。”',
+    continueBtn: '继续 →',
+    contentHint: '安全、适合的内容 · 支持中文',
+    toneLabel: '语气风格',
+    humorLabel: '幽默类型',
+    regenBtn: '↺ 重新生成',
+    aiDisclaimer: '🤖 内容由 AI 生成 · 使用前请自行斟酌',
+    styleFormal: '🎩 正式',
+    styleBalanced: '⚖️ 均衡',
+    styleCasual: '😊 轻松',
+    humorBalanced: '😊 均衡幽默',
+    humorDry: '🧊 冷幽默',
+    humorDad: '👨 老父笑话',
+    humorSarcastic: '😏 吐槽风',
+    humorDark: '🌑 阴间笑话',
+    humorSelfDep: '🙈 自小文化',
+    humorWordplay: '🔤 谐音棗',
+    humorOneLiners: '⚡ 一句棗',
+    humorMisdirect: '🪄 反转棗',
+    humorPop: '🌐 热棗/时事棗',
+    navHome: '首页',
+    navWork: '职场', navLifestyle: '生活',
+    navPersonalize: '个性定制', navResults: '你的推荐',
+    badgeWork: '💼 职场', badgeLifestyle: '🎉 生活',
+  },
+};
+function t(key, ...args) {
+  const v = (STRINGS[state.language] || STRINGS.en)[key];
+  return typeof v === 'function' ? v(...args) : (v || STRINGS.en[key] || key);
+}
+
+// ─── Language Selection ────────────────────────────────────────
+function selectLanguage(lang) {
+  state.language = lang;
+  document.getElementById('langBtnEn').classList.toggle('active', lang === 'en');
+  document.getElementById('langBtnZh').classList.toggle('active', lang === 'zh');
+  updateUILanguage();
+}
+
+function updateUILanguage() {
+  // Home page
+  const el = (id) => document.getElementById(id);
+  const setText = (id, key) => { const e = el(id); if (e) e.textContent = t(key); };
+  setText('homeTitle',       'homeTitle');
+  setText('homeSubtitle',    'homeSubtitle');
+  setText('chooseSetting',   'chooseSetting');
+  setText('workModeName',    'workName');
+  setText('workModeDesc',    'workDesc');
+  setText('lifestyleModeName', 'lifestyleName');
+  setText('lifestyleModeDesc', 'lifestyleDesc');
+  setText('howStep1',        'howStep1');
+  setText('howStep2',        'howStep2');
+  setText('howStep3',        'howStep3');
+  setText('homeDisclaimer',  'homeDisclaimer');
+  // Input view
+  setText('inputModeBadgeSub', 'inputSubtitle');
+  setText('inputTipText',    'tipText');
+  setText('situationHeader', 'situationHeader');
+  setText('continueBtn',     'continueBtn');
+  const ctx = el('contextInput');
+  if (ctx) ctx.placeholder = t('placeholder');
+  // Questions view (also updated in renderQuestionsLoading/renderQuestions)
+  setText('questionsIntroTitle', 'questionsTitle');
+  setText('questionsIntroSub',   'questionsSub');
+  const genBtn = el('questionsGenerateBtn');
+  if (genBtn) genBtn.textContent = t('generateBtn');
+  const skipBtn = el('questionsSkipBtn');
+  if (skipBtn) skipBtn.textContent = t('skipBtn');
+  // Results controls
+  setText('toneLabel',  'toneLabel');
+  setText('humorLabel', 'humorLabel');
+  const regenBtn = el('regenBtn');
+  if (regenBtn) regenBtn.innerHTML = `<span id="regenIcon">↺</span> ${t('regenBtn').replace('↺ ', '')}`;
+  const disc = el('aiDisclaimer');
+  if (disc) disc.textContent = t('aiDisclaimer');
+  // Style pills
+  const stylePillMap = { formal: 'styleFormal', neutral: 'styleBalanced', casual: 'styleCasual' };
+  document.querySelectorAll('.style-pill').forEach(p => {
+    const key = stylePillMap[p.dataset.style];
+    if (key) p.textContent = t(key);
+  });
+  // Humor pills
+  const humorPillMap = {
+    balanced: 'humorBalanced', dry: 'humorDry', dad: 'humorDad',
+    sarcastic: 'humorSarcastic', dark: 'humorDark', selfDeprecating: 'humorSelfDep',
+    wordplay: 'humorWordplay', oneLiners: 'humorOneLiners',
+    misdirect: 'humorMisdirect', popCulture: 'humorPop',
+  };
+  document.querySelectorAll('.humor-pill').forEach(p => {
+    const key = humorPillMap[p.dataset.humor];
+    if (key) p.textContent = t(key);
+  });
+  // Mode badge (if visible)
+  if (state.setting) {
+    const badge = el('inputModeBadge');
+    if (badge) badge.textContent = t(state.setting === 'work' ? 'badgeWork' : 'badgeLifestyle');
+  }
+}
 
 // ─── Navigation (3-state: default=right / .active / .prev=left) ──────
 function navigateTo(viewId) {
@@ -1299,7 +1504,7 @@ function updateNavbar(viewId) {
   const backBtn   = document.getElementById('backBtn');
   const navTitle  = document.getElementById('navTitle');
   const backLabel = document.getElementById('backLabel');
-  const modeName  = state.setting === 'work' ? 'Work' : 'Lifestyle';
+  const modeName  = state.setting === 'work' ? t('navWork') : t('navLifestyle');
 
   switch (viewId) {
     case 'mode':
@@ -1310,20 +1515,20 @@ function updateNavbar(viewId) {
     case 'input':
       navbar.classList.remove('transparent');
       backBtn.classList.remove('hidden');
-      backLabel.textContent = 'Home';
+      backLabel.textContent = t('navHome');
       navTitle.textContent = modeName;
       break;
     case 'questions':
       navbar.classList.remove('transparent');
       backBtn.classList.remove('hidden');
       backLabel.textContent = modeName;
-      navTitle.textContent = 'Personalize';
+      navTitle.textContent = t('navPersonalize');
       break;
     case 'results':
       navbar.classList.remove('transparent');
       backBtn.classList.remove('hidden');
-      backLabel.textContent = 'Personalize';
-      navTitle.textContent = 'Your Suggestions';
+      backLabel.textContent = t('navPersonalize');
+      navTitle.textContent = t('navResults');
       break;
   }
 }
@@ -1339,7 +1544,7 @@ function selectMode(mode) {
 
   const badge = document.getElementById('inputModeBadge');
   badge.className = 'mode-badge ' + mode;
-  badge.textContent = mode === 'work' ? '💼 Work' : '🎉 Lifestyle';
+  badge.textContent = t(mode === 'work' ? 'badgeWork' : 'badgeLifestyle');
 
   const btn = document.getElementById('continueBtn');
   btn.className = 'btn-primary' + (mode === 'lifestyle' ? ' lifestyle' : '');
@@ -1380,7 +1585,7 @@ async function proceedToQuestions() {
     const res = await fetch('/api/questions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ setting: state.setting, context: state.context }),
+      body: JSON.stringify({ setting: state.setting, context: state.context, language: state.language }),
     });
 
     const data = await res.json();
@@ -1411,6 +1616,10 @@ function renderQuestionsLoading() {
 
   document.getElementById('questionsGenerateBtn').style.display = 'none';
   document.getElementById('questionsSkip').style.display = 'none';
+  const introTitle = document.getElementById('questionsIntroTitle');
+  const introSub   = document.getElementById('questionsIntroSub');
+  if (introTitle) introTitle.textContent = t('questionsTitle');
+  if (introSub)   introSub.textContent   = t('questionsSub');
 }
 
 function renderQuestions(questions) {
@@ -1443,7 +1652,10 @@ function renderQuestions(questions) {
   });
 
   document.getElementById('questionsGenerateBtn').style.display = 'flex';
+  document.getElementById('questionsGenerateBtn').textContent = t('generateBtn');
   document.getElementById('questionsSkip').style.display = 'block';
+  const skipBtn2 = document.getElementById('questionsSkipBtn');
+  if (skipBtn2) skipBtn2.textContent = t('skipBtn');
 }
 
 // ─── Chip Selection (data-attribute based — no apostrophe bug) ────────
@@ -1522,6 +1734,7 @@ async function generateFromAnswers() {
         style: state.style,
         humorType: state.humorType,
         answers: buildAnswersMap(),
+        language: state.language,
       }),
     });
 
@@ -1554,6 +1767,7 @@ async function regenerate() {
         style: state.style,
         humorType: state.humorType,
         answers: buildAnswersMap(),
+        language: state.language,
       }),
     });
 
@@ -1595,8 +1809,8 @@ function renderLoading() {
     <div class="results-banner loading">
       <span class="results-banner-emoji">⏳</span>
       <div class="results-banner-text">
-        <div class="results-banner-title">Cooking up your lines…</div>
-        <div class="results-banner-sub">AI is working its magic ✨</div>
+        <div class="results-banner-title">${t('loadingTitle')}</div>
+        <div class="results-banner-sub">${t('loadingSub')}</div>
       </div>
     </div>`;
   document.getElementById('resultsBanner').style.display = 'block';
@@ -1612,16 +1826,16 @@ function renderLoading() {
     <div class="section-banner ib">
       <span class="section-banner-emoji">💬</span>
       <div class="section-banner-info">
-        <div class="section-banner-title">Ice Breakers</div>
-        <div class="section-banner-sub">Loading…</div>
+        <div class="section-banner-title">${t('ibTitle')}</div>
+        <div class="section-banner-sub">${t('ibSub')}…</div>
       </div>
     </div>
     ${skeleton(3)}
     <div class="section-banner joke" style="margin-top:8px">
       <span class="section-banner-emoji">😂</span>
       <div class="section-banner-info">
-        <div class="section-banner-title">Jokes</div>
-        <div class="section-banner-sub">Loading…</div>
+        <div class="section-banner-title">${t('jokTitle')}</div>
+        <div class="section-banner-sub">${t('jokSub')}…</div>
       </div>
     </div>
     ${skeleton(3)}
@@ -1644,8 +1858,8 @@ function renderSuggestions() {
     <div class="results-banner">
       <span class="results-banner-emoji">${bannerEmoji}</span>
       <div class="results-banner-text">
-        <div class="results-banner-title">You've got lines!</div>
-        <div class="results-banner-sub">${iceBreakers.length} ice breakers · ${jokes.length} jokes — go crush it 💪</div>
+        <div class="results-banner-title">${t('bannerTitle')}</div>
+        <div class="results-banner-sub">${t('bannerSub', iceBreakers.length, jokes.length)}</div>
       </div>
     </div>`;
   document.getElementById('resultsBanner').style.display = 'block';
@@ -1674,8 +1888,8 @@ function renderSuggestions() {
       <div class="section-banner ib">
         <span class="section-banner-emoji">💬</span>
         <div class="section-banner-info">
-          <div class="section-banner-title">Ice Breakers</div>
-          <div class="section-banner-sub">Kick off the conversation</div>
+          <div class="section-banner-title">${t('ibTitle')}</div>
+          <div class="section-banner-sub">${t('ibSub')}</div>
         </div>
         <span class="section-count-pill">${iceBreakers.length}</span>
       </div>
@@ -1685,8 +1899,8 @@ function renderSuggestions() {
       <div class="section-banner joke">
         <span class="section-banner-emoji">😂</span>
         <div class="section-banner-info">
-          <div class="section-banner-title">Jokes</div>
-          <div class="section-banner-sub">Get the laughs rolling</div>
+          <div class="section-banner-title">${t('jokTitle')}</div>
+          <div class="section-banner-sub">${t('jokSub')}</div>
         </div>
         <span class="section-count-pill">${jokes.length}</span>
       </div>
@@ -1769,6 +1983,7 @@ async function replaceCard(index) {
         answers:   buildAnswersMap(),
         type:      rejected.type,
         rejected:  rejected.content,
+        language:  state.language,
       }),
     });
 
@@ -1900,3 +2115,5 @@ updateNavbar('mode');
 </script>
 </body>
 </html>
+
+
