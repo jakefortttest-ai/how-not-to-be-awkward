@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <title>How Not To Be Awkward</title>
+  <style>
+    /* ─── Reset & Base ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:         #007AFF;
+      --blue-light:   #E8F2FF;
+      --orange:       #FF9500;
+      --orange-light: #FFF4E0;
+      --pink:         #FF2D55;
+      --green:        #34C759;
+      --red:          #FF3B30;
+
+      --bg:           #F2F2F7;
+      --card:         #FFFFFF;
+      --label:        #000000;
+      --label-2:      rgba(60,60,67,0.75);
+      --label-3:      rgba(60,60,67,0.50);
+      --separator:    rgba(60,60,67,0.29);
+      --fill-4:       rgba(120,120,128,0.08);
+
+      --gray:         #8E8E93;
+      --gray-3:       #C7C7CC;
+      --gray-5:       #E5E5EA;
+      --gray-6:       #F2F2F7;
+
+      --nav-h:        54px;
+      --radius-card:  16px;
+      --radius-btn:   14px;
+      --ease-ios:     cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    html { height: 100%; }
+
+    body {
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
+                   'Helvetica Neue', Arial, sans-serif;
+      background: var(--gray-6);
+      -webkit-font-smoothing: antialiased;
+      -webkit-tap-highlight-color: transparent;
+      overflow: hidden;
+    }
+
+    /* ─── App Shell ───────────────────────────────────────────── */
+    #app {
+      max-width: 430px;
+      margin: 0 auto;
+      height: 100dvh;
+      position: relative;
+      overflow: hidden;
+      background: var(--bg);
+      box-shadow: 0 0 60px rgba(0,0,0,0.15);
+    }
+
+    /* ─── Navigation Bar ──────────────────────────────────────── */
+    .navbar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+      padding-top: env(safe-area-inset-top, 0px);
+      background: rgba(242,242,247,0.88);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 0.5px solid var(--separator);
+      z-index: 100;
+      transition: background 0.3s, border-color 0.3s, backdrop-filter 0.3s;
+    }
+    .navbar.transparent {
+      background: transparent;
+      border-bottom-color: transparent;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+
+    .nav-back {
+      display: flex;
+      align-items: center;
+      gap: 1px;
+      background: none;
+      border: none;
+      color: var(--blue);
+      font-size: 17px;
+      font-weight: 400;
+      padding: 8px 8px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+      min-width: 80px;
+    }
+    .nav-back:active { opacity: 0.4; }
+    .nav-back .chevron { font-size: 24px; font-weight: 200; line-height: 1; margin-right: 1px; }
+    .nav-back.hidden { visibility: hidden; pointer-events: none; }
+
+    .nav-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--label);
+      text-align: center;
+      flex: 1;
+    }
+    .nav-right { min-width: 80px; }
+
+    /* ─── Views — 3-state system (FIX for back button bug) ───── */
+    /*
+     * Default (no extra class) = hidden to the RIGHT  → translateX(100%)
+     * .active                  = visible              → translateX(0)
+     * .prev                    = hidden to the LEFT   → translateX(-25%)
+     *
+     * Forward: current → .prev, next (was default) → .active
+     * Back:    current (remove .active) → default, prev (remove .prev) → .active
+     * No setTimeout needed. No class leaks.
+     */
+    .views-container {
+      position: absolute;
+      inset: 0;
+    }
+
+    .view {
+      position: absolute;
+      inset: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      padding-top: calc(var(--nav-h) + env(safe-area-inset-top, 0px));
+      padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+      background: var(--bg);
+
+      /* Default: hidden to the right */
+      transform: translateX(100%);
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.36s var(--ease-ios), opacity 0.30s var(--ease-ios);
+      will-change: transform;
+    }
+
+    .view.active {
+      transform: translateX(0);
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .view.prev {
+      transform: translateX(-25%);
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Home view has no top navbar padding */
+    #view-mode { padding-top: env(safe-area-inset-top, 0px); }
+
+    /* ─── Home View ───────────────────────────────────────────── */
+    .home-hero {
+      padding: 48px 24px 28px;
+      text-align: center;
+    }
+    .home-emoji {
+      font-size: 64px;
+      line-height: 1;
+      margin-bottom: 16px;
+      display: block;
+      animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+    .home-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--label);
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+    .home-subtitle {
+      font-size: 15px;
+      color: var(--label-2);
+      line-height: 1.5;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+    .section-label {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray);
+      padding: 0 20px;
+      margin-bottom: 8px;
+    }
+    .mode-cards {
+      padding: 0 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .mode-card {
+      background: var(--card);
+      border-radius: var(--radius-card);
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      cursor: pointer;
+      border: none;
+      width: 100%;
+      text-align: left;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.06);
+      transition: transform 0.12s, box-shadow 0.12s;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .mode-card:active {
+      transform: scale(0.97);
+      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+    }
+    .mode-icon-wrap {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+    .mode-icon-wrap.work      { background: linear-gradient(145deg, #34AADC, #007AFF); }
+    .mode-icon-wrap.lifestyle { background: linear-gradient(145deg, #FFB340, #FF2D55); }
+    .mode-info { flex: 1; min-width: 0; }
+    .mode-name { font-size: 18px; font-weight: 600; color: var(--label); margin-bottom: 3px; }
+    .mode-desc { font-size: 13px; color: var(--label-2); line-height: 1.4; }
+    .mode-arrow { font-size: 20px; color: var(--gray-3); font-weight: 300; }
+    .home-disclaimer {
+      font-size: 12px;
+      color: var(--label-3);
+      text-align: center;
+      padding: 24px 24px 0;
+      line-height: 1.5;
+    }
+
+    /* ─── Input View ──────────────────────────────────────────── */
+    .view-content { padding: 16px; }
+
+    .mode-badge-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 4px;
+      margin-bottom: 20px;
+    }
+    .mode-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .mode-badge.work      { background: var(--blue-light);   color: var(--blue); }
+    .mode-badge.lifestyle { background: var(--orange-light); color: #C97500; }
+    .mode-badge-sub { font-size: 14px; color: var(--label-3); }
+
+    .form-section { margin-bottom: 24px; }
+    .form-section-header {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray);
+      padding: 0 4px;
+      margin-bottom: 8px;
+    }
+    .form-group {
+      background: var(--card);
+      border-radius: var(--radius-card);
+      overflow: hidden;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.05), 0 0 0 0.5px rgba(0,0,0,0.06);
+    }
+    .form-group-row {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 0.5px solid var(--separator);
+    }
+    .form-group-row:last-child { border-bottom: none; }
+
+    textarea, input[type="url"] {
+      width: 100%;
+      background: none;
+      border: none;
+      outline: none;
+      font-family: inherit;
+      font-size: 16px;
+      color: var(--label);
+      resize: none;
+      line-height: 1.5;
+    }
+    textarea::placeholder, input::placeholder { color: var(--gray-3); }
+    textarea { min-height: 110px; padding: 14px 16px; display: block; }
+    input[type="url"] { flex: 1; }
+    .url-prefix { font-size: 15px; color: var(--label-3); margin-right: 6px; flex-shrink: 0; }
+
+    .char-count { font-size: 12px; color: var(--label-3); text-align: right; padding: 6px 4px 0; }
+    .char-count.warn { color: var(--orange); }
+    .char-count.over { color: var(--red); }
+    .form-hint { font-size: 12px; color: var(--label-3); padding: 8px 4px 0; line-height: 1.5; }
+
+    /* ─── Primary Button ──────────────────────────────────────── */
+    .btn-primary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 16px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 17px;
+      font-weight: 600;
+      border: none;
+      border-radius: var(--radius-btn);
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform 0.12s, opacity 0.12s;
+      -webkit-user-select: none;
+      user-select: none;
+      box-shadow: 0 4px 16px rgba(0,122,255,0.35);
+    }
+    .btn-primary:active { transform: scale(0.97); opacity: 0.85; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    .btn-primary.lifestyle {
+      background: linear-gradient(135deg, #FF9500, #FF2D55);
+      box-shadow: 0 4px 16px rgba(255,45,85,0.30);
+    }
+
+    /* ─── Questions View ──────────────────────────────────────── */
+    .questions-intro {
+      padding: 4px 4px 20px;
+    }
+    .questions-intro-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--label);
+      margin-bottom: 6px;
+    }
+    .questions-intro-sub {
+      font-size: 14px;
+      color: var(--label-2);
+      line-height: 1.5;
+    }
+
+    .question-card {
+      background: var(--card);
+      border-radius: var(--radius-card);
+      padding: 16px;
+      margin-bottom: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05), 0 0 0 0.5px rgba(0,0,0,0.06);
+      animation: cardIn 0.35s var(--ease-ios) both;
+    }
+    .question-card:nth-child(1) { animation-delay: 0.04s; }
+    .question-card:nth-child(2) { animation-delay: 0.10s; }
+    .question-card:nth-child(3) { animation-delay: 0.16s; }
+    .question-card:nth-child(4) { animation-delay: 0.22s; }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(14px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0)    scale(1); }
+    }
+
+    .question-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--label);
+      margin-bottom: 12px;
+      line-height: 1.35;
+    }
+
+    .chips-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      padding: 8px 14px;
+      border-radius: 100px;
+      border: 1.5px solid var(--gray-5);
+      background: var(--gray-6);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--label-2);
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.15s, background 0.15s, color 0.15s, transform 0.1s;
+      -webkit-user-select: none;
+      user-select: none;
+      line-height: 1.2;
+    }
+    .chip:active { transform: scale(0.94); }
+    .chip.selected {
+      border-color: var(--blue);
+      background: var(--blue-light);
+      color: var(--blue);
+      font-weight: 600;
+    }
+    .chip.chip-other {
+      border-style: dashed;
+      color: var(--label-3);
+    }
+    .chip.chip-other.selected {
+      border-color: var(--blue);
+      border-style: solid;
+      background: var(--blue-light);
+      color: var(--blue);
+    }
+
+    .other-input-row {
+      margin-top: 10px;
+      display: none;
+    }
+    .other-input-row.visible { display: block; }
+    .other-input {
+      width: 100%;
+      background: var(--gray-6);
+      border: 1.5px solid var(--blue);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-family: inherit;
+      font-size: 15px;
+      color: var(--label);
+      outline: none;
+    }
+    .other-input::placeholder { color: var(--gray-3); }
+
+    .questions-skip {
+      text-align: center;
+      padding: 12px 0 4px;
+      font-size: 14px;
+      color: var(--label-3);
+    }
+    .questions-skip button {
+      background: none;
+      border: none;
+      color: var(--blue);
+      font-size: 14px;
+      font-family: inherit;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+    .questions-skip button:active { opacity: 0.5; }
+
+    /* ─── Results Controls (tone + humor) ────────────────────── */
+    .controls-block {
+      margin-bottom: 12px;
+    }
+    .controls-label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray);
+      padding: 0 2px;
+      margin-bottom: 8px;
+    }
+    .pills-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+    .humor-pill {
+      padding: 7px 13px;
+      border-radius: 100px;
+      border: 1.5px solid var(--gray-5);
+      background: var(--card);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--label-2);
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.15s, background 0.15s, color 0.15s, transform 0.1s;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .humor-pill:active { transform: scale(0.94); }
+    .humor-pill.active {
+      border-color: var(--purple, #AF52DE);
+      background: rgba(175,82,222,0.10);
+      color: var(--purple, #AF52DE);
+      font-weight: 600;
+    }
+    #resultsControls { margin-bottom: 20px; }
+    #resultsControls .btn-outline { margin-top: 14px; }
+
+    /* ─── Results Section Headers ─────────────────────────────── */
+    .results-section-header {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--label);
+      padding: 4px 2px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .results-section-header .count-badge {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 100px;
+      background: var(--fill-4);
+      color: var(--label-3);
+    }
+    .results-section + .results-section {
+      margin-top: 8px;
+    }
+
+    /* ─── Results View ────────────────────────────────────────── */
+    .results-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 4px;
+      margin-bottom: 16px;
+    }
+    .results-meta-left { font-size: 14px; color: var(--label-2); }
+    .results-meta-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--fill-4);
+      color: var(--label-2);
+    }
+
+    /* ─── Suggestion Card ─────────────────────────────────────── */
+    .suggestion-card {
+      background: var(--card);
+      border-radius: var(--radius-card);
+      margin-bottom: 14px;
+      overflow: hidden;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.06);
+      animation: cardIn 0.4s var(--ease-ios) both;
+    }
+    .suggestion-card:nth-child(1) { animation-delay: 0.05s; }
+    .suggestion-card:nth-child(2) { animation-delay: 0.12s; }
+    .suggestion-card:nth-child(3) { animation-delay: 0.19s; }
+
+    .card-header {
+      padding: 14px 16px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+    }
+    .type-badge.icebreaker { background: var(--blue-light); color: var(--blue); }
+    .type-badge.joke       { background: var(--orange-light); color: #C97500; }
+    .card-number { font-size: 12px; color: var(--label-3); font-weight: 500; }
+
+    .card-content { padding: 12px 16px 16px; font-size: 16px; color: var(--label); line-height: 1.55; }
+    .card-divider { height: 0.5px; background: var(--separator); margin: 0 16px; }
+
+    .card-actions { display: flex; align-items: center; padding: 10px 12px; gap: 4px; }
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 7px 10px;
+      background: none;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--label-2);
+      font-family: inherit;
+      transition: background 0.15s, transform 0.1s, color 0.15s;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .action-btn:active { transform: scale(0.92); }
+    .action-btn .icon { font-size: 16px; }
+    .action-btn.active-up   { color: var(--green); background: rgba(52,199,89,0.10); }
+    .action-btn.active-down { color: var(--red);   background: rgba(255,59,48,0.10); }
+    .action-btn.copied      { color: var(--green); background: rgba(52,199,89,0.10); }
+    .action-spacer { flex: 1; }
+    .report-btn {
+      padding: 6px 10px;
+      background: none;
+      border: none;
+      font-size: 12px;
+      color: var(--label-3);
+      cursor: pointer;
+      font-family: inherit;
+      border-radius: 6px;
+      transition: color 0.15s;
+    }
+    .report-btn:hover { color: var(--red); }
+
+    /* ─── Style Selector ──────────────────────────────────────── */
+    .style-section { margin: 24px 0 16px; }
+    .style-section-header {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--gray);
+      padding: 0 4px;
+      margin-bottom: 10px;
+    }
+    .style-pills { display: flex; gap: 8px; flex-wrap: wrap; }
+    .style-pill {
+      padding: 8px 16px;
+      border-radius: 100px;
+      border: 1.5px solid var(--gray-5);
+      background: var(--card);
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--label-2);
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.15s, background 0.15s, color 0.15s, transform 0.1s;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .style-pill:active { transform: scale(0.95); }
+    .style-pill.active { border-color: var(--blue); background: var(--blue-light); color: var(--blue); font-weight: 600; }
+
+    /* ─── Outline Button (Regenerate) ─────────────────────────── */
+    .btn-outline {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px;
+      background: var(--card);
+      color: var(--blue);
+      font-size: 16px;
+      font-weight: 600;
+      border: 1.5px solid var(--gray-5);
+      border-radius: var(--radius-btn);
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform 0.12s, background 0.12s;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .btn-outline:active { transform: scale(0.97); background: var(--gray-6); }
+    .btn-outline:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .ai-disclaimer {
+      margin-top: 20px;
+      padding: 12px 16px;
+      background: var(--fill-4);
+      border-radius: 10px;
+      font-size: 12px;
+      color: var(--label-3);
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    /* ─── Skeleton Loading ────────────────────────────────────── */
+    .skeleton-card {
+      background: var(--card);
+      border-radius: var(--radius-card);
+      margin-bottom: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    .skeleton-line {
+      height: 12px;
+      border-radius: 6px;
+      background: linear-gradient(90deg, var(--gray-5) 0%, var(--gray-6) 50%, var(--gray-5) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s ease-in-out infinite;
+      margin-bottom: 10px;
+    }
+    .skeleton-line:last-child { margin-bottom: 0; }
+    .skeleton-line.short  { width: 40%; }
+    .skeleton-line.medium { width: 65%; }
+    .skeleton-line.full   { width: 100%; }
+    .skeleton-chip {
+      display: inline-block;
+      height: 34px;
+      border-radius: 100px;
+      background: linear-gradient(90deg, var(--gray-5) 0%, var(--gray-6) 50%, var(--gray-5) 100%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s ease-in-out infinite;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 200% center; }
+      100% { background-position: -200% center; }
+    }
+
+    /* ─── Error State ─────────────────────────────────────────── */
+    .error-box {
+      background: rgba(255,59,48,0.08);
+      border: 1px solid rgba(255,59,48,0.2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .error-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+    .error-text { font-size: 14px; color: var(--red); line-height: 1.5; flex: 1; }
+
+    /* ─── Toast ───────────────────────────────────────────────── */
+    #toast {
+      position: absolute;
+      bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,0.78);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 100px;
+      font-size: 14px;
+      font-weight: 500;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+    #toast.show { opacity: 1; }
+
+    /* ─── Report Modal ────────────────────────────────────────── */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.40);
+      z-index: 200;
+      display: flex;
+      align-items: flex-end;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+    .modal-sheet {
+      background: var(--card);
+      border-radius: 20px 20px 0 0;
+      width: 100%;
+      padding: 12px 0 calc(24px + env(safe-area-inset-bottom, 0px));
+      transform: translateY(100%);
+      transition: transform 0.35s var(--ease-ios);
+    }
+    .modal-overlay.open .modal-sheet { transform: translateY(0); }
+    .modal-handle { width: 36px; height: 4px; background: var(--gray-3); border-radius: 2px; margin: 0 auto 16px; }
+    .modal-title {
+      font-size: 17px;
+      font-weight: 600;
+      text-align: center;
+      padding: 0 24px 16px;
+      color: var(--label);
+      border-bottom: 0.5px solid var(--separator);
+    }
+    .modal-option {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 24px;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+      font-family: inherit;
+      font-size: 16px;
+      color: var(--label);
+      cursor: pointer;
+      border-bottom: 0.5px solid var(--separator);
+      transition: background 0.12s;
+    }
+    .modal-option:last-child { border-bottom: none; }
+    .modal-option:active { background: var(--fill-4); }
+    .modal-option .opt-icon { font-size: 20px; }
+    .modal-cancel {
+      display: block;
+      width: calc(100% - 32px);
+      margin: 12px 16px 0;
+      padding: 16px;
+      background: var(--gray-6);
+      border: none;
+      border-radius: 14px;
+      font-family: inherit;
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--blue);
+      cursor: pointer;
+      transition: opacity 0.12s;
+    }
+    .modal-cancel:active { opacity: 0.6; }
+
+    /* ─── Spinner ─────────────────────────────────────────────── */
+    .spin { display: inline-block; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .mt-16 { margin-top: 16px; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- Navigation Bar -->
+  <nav class="navbar transparent" id="navbar">
+    <button class="nav-back hidden" id="backBtn" onclick="goBack()">
+      <span class="chevron">‹</span><span id="backLabel">Back</span>
+    </button>
+    <span class="nav-title" id="navTitle"></span>
+    <div class="nav-right"></div>
+  </nav>
+
+  <div class="views-container">
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- VIEW 1: MODE SELECTION                     -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="view active" id="view-mode">
+      <div class="home-hero">
+        <span class="home-emoji">😬</span>
+        <h1 class="home-title">How Not To Be Awkward</h1>
+        <p class="home-subtitle">AI-powered ice breakers &amp; jokes, crafted for your exact situation.</p>
+      </div>
+
+      <p class="section-label">Choose Your Setting</p>
+      <div class="mode-cards">
+        <button class="mode-card" onclick="selectMode('work')">
+          <div class="mode-icon-wrap work">💼</div>
+          <div class="mode-info">
+            <div class="mode-name">Work</div>
+            <div class="mode-desc">Meetings, presentations, onboarding &amp; professional events</div>
+          </div>
+          <span class="mode-arrow">›</span>
+        </button>
+        <button class="mode-card" onclick="selectMode('lifestyle')">
+          <div class="mode-icon-wrap lifestyle">🎉</div>
+          <div class="mode-info">
+            <div class="mode-name">Lifestyle</div>
+            <div class="mode-desc">Parties, dates, social gatherings &amp; new friendships</div>
+          </div>
+          <span class="mode-arrow">›</span>
+        </button>
+      </div>
+
+      <p class="home-disclaimer">
+        All content is AI-generated and safety-reviewed.<br />
+        We never store personal information about others.
+      </p>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- VIEW 2: CONTEXT INPUT                      -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="view" id="view-input">
+      <div class="view-content">
+
+        <div class="mode-badge-row">
+          <span class="mode-badge" id="inputModeBadge"></span>
+          <span class="mode-badge-sub">Describe your situation</span>
+        </div>
+
+        <div class="form-section">
+          <div class="form-section-header">Your Situation</div>
+          <div class="form-group">
+            <textarea
+              id="contextInput"
+              placeholder="e.g. "Starting a Q2 all-hands with 60 engineers who just shipped a big release.""
+              maxlength="500"
+              oninput="onContextInput()"
+            ></textarea>
+          </div>
+          <div class="char-count" id="charCount">0 / 500</div>
+        </div>
+
+        <div class="form-section" id="urlSection" style="display:none">
+          <div class="form-section-header">
+            Presentation Link
+            <span style="font-weight:400;text-transform:none;font-size:11px;color:var(--label-3);letter-spacing:0"> — Optional</span>
+          </div>
+          <div class="form-group">
+            <div class="form-group-row">
+              <span class="url-prefix">🔗</span>
+              <input type="url" id="urlInput" placeholder="https://docs.google.com/…" />
+            </div>
+          </div>
+          <p class="form-hint">We'll use your presentation for additional context.</p>
+        </div>
+
+        <button class="btn-primary" id="continueBtn" onclick="proceedToQuestions()" disabled>
+          Continue →
+        </button>
+
+        <p class="form-hint" style="text-align:center;margin-top:12px;">
+          Safe &amp; appropriate content · English only
+        </p>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- VIEW 3: SMART QUESTIONS                    -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="view" id="view-questions">
+      <div class="view-content">
+
+        <div class="questions-intro">
+          <div class="questions-intro-title">Tell us a bit more</div>
+          <div class="questions-intro-sub">
+            A few quick taps will help us craft perfectly tailored suggestions.
+          </div>
+        </div>
+
+        <div id="questionsContainer"></div>
+
+        <button class="btn-primary mt-16" id="questionsGenerateBtn"
+                onclick="generateFromAnswers()" style="display:none">
+          ✨ Generate Suggestions
+        </button>
+
+        <div class="questions-skip" id="questionsSkip" style="display:none">
+          <button onclick="generateFromAnswers()">Skip &amp; generate anyway</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- VIEW 4: RESULTS                            -->
+    <!-- ══════════════════════════════════════════ -->
+    <div class="view" id="view-results">
+      <div class="view-content">
+
+        <!-- Meta row -->
+        <div class="results-meta">
+          <span class="results-meta-left" id="resultsMetaLeft"></span>
+          <span class="results-meta-badge" id="resultsMetaBadge"></span>
+        </div>
+
+        <!-- ── Controls (shown after generation) ── -->
+        <div id="resultsControls" style="display:none">
+          <div class="controls-block">
+            <div class="controls-label">Tone</div>
+            <div class="pills-row">
+              <button class="style-pill" data-style="formal"  onclick="setStyle('formal')" >🎩 Formal</button>
+              <button class="style-pill active" data-style="neutral" onclick="setStyle('neutral')">⚖️ Balanced</button>
+              <button class="style-pill" data-style="casual"  onclick="setStyle('casual')" >😊 Casual</button>
+            </div>
+          </div>
+          <div class="controls-block">
+            <div class="controls-label">Humor Style</div>
+            <div class="pills-row">
+              <button class="humor-pill active" data-humor="balanced"        onclick="setHumor('balanced')"       >😊 Balanced</button>
+              <button class="humor-pill" data-humor="dry"             onclick="setHumor('dry')"           >🧊 Dry</button>
+              <button class="humor-pill" data-humor="dad"             onclick="setHumor('dad')"           >👨 Dad Joke</button>
+              <button class="humor-pill" data-humor="sarcastic"       onclick="setHumor('sarcastic')"     >😏 Sarcastic</button>
+              <button class="humor-pill" data-humor="dark"            onclick="setHumor('dark')"          >🌑 Dark</button>
+              <button class="humor-pill" data-humor="selfDeprecating" onclick="setHumor('selfDeprecating')">🙈 Self-Deprecating</button>
+              <button class="humor-pill" data-humor="wordplay"        onclick="setHumor('wordplay')"      >🔤 Wordplay & Puns</button>
+              <button class="humor-pill" data-humor="oneLiners"       onclick="setHumor('oneLiners')"     >⚡ Witty One-Liners</button>
+            </div>
+          </div>
+          <button class="btn-outline" id="regenBtn" onclick="regenerate()">
+            <span id="regenIcon">↺</span> Regenerate
+          </button>
+        </div>
+
+        <!-- ── Results body (loading skeletons OR two sections) ── -->
+        <div id="resultsBody"></div>
+
+        <div class="ai-disclaimer" id="aiDisclaimer" style="display:none">
+          🤖 AI-generated content · Review before sharing
+        </div>
+
+      </div>
+    </div>
+
+  </div><!-- /views-container -->
+
+  <div id="toast"></div>
+
+  <!-- Report Modal -->
+  <div class="modal-overlay" id="reportModal" onclick="closeReportModal(event)">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Report This Content</div>
+      <button class="modal-option" onclick="submitReport('offensive')">
+        <span class="opt-icon">🚫</span> Offensive or harmful
+      </button>
+      <button class="modal-option" onclick="submitReport('inappropriate')">
+        <span class="opt-icon">⚠️</span> Inappropriate for context
+      </button>
+      <button class="modal-option" onclick="submitReport('inaccurate')">
+        <span class="opt-icon">🤔</span> Irrelevant or doesn't make sense
+      </button>
+      <button class="modal-cancel" onclick="closeReportModal()">Cancel</button>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<script>
+// ─── State ───────────────────────────────────────────────────────────
+const state = {
+  currentView: 'mode',
+  history: [],
+  setting: null,
+  style: 'neutral',
+  humorType: 'balanced',
+  context: '',
+  url: '',
+  questions: [],
+  questionsMap: {},  // qId → question text (avoids apostrophe bug in onclick)
+  answers: {},       // qId → { question, answer }
+  suggestions: [],
+  feedbacks: {},
+  reportTarget: null,
+};
+
+// ─── Navigation (3-state: default=right / .active / .prev=left) ──────
+function navigateTo(viewId) {
+  if (state.currentView === viewId) return;
+
+  const currentEl = document.getElementById('view-' + state.currentView);
+  const nextEl    = document.getElementById('view-' + viewId);
+
+  state.history.push(state.currentView);
+
+  // Current slides to the left (.prev)
+  currentEl.classList.remove('active');
+  currentEl.classList.add('prev');
+
+  // Next slides in from the right (was default = translateX(100%))
+  nextEl.classList.remove('prev');
+  nextEl.classList.add('active');
+
+  state.currentView = viewId;
+  updateNavbar(viewId);
+}
+
+function goBack() {
+  if (state.history.length === 0) return;
+  const prevId = state.history.pop();
+
+  const currentEl = document.getElementById('view-' + state.currentView);
+  const prevEl    = document.getElementById('view-' + prevId);
+
+  // Current slides back to the right (remove .active → default = translateX(100%))
+  currentEl.classList.remove('active');
+
+  // Previous slides back from the left (remove .prev → .active)
+  prevEl.classList.remove('prev');
+  prevEl.classList.add('active');
+
+  state.currentView = prevId;
+  updateNavbar(prevId);
+}
+
+function updateNavbar(viewId) {
+  const navbar    = document.getElementById('navbar');
+  const backBtn   = document.getElementById('backBtn');
+  const navTitle  = document.getElementById('navTitle');
+  const backLabel = document.getElementById('backLabel');
+  const modeName  = state.setting === 'work' ? 'Work' : 'Lifestyle';
+
+  switch (viewId) {
+    case 'mode':
+      navbar.classList.add('transparent');
+      backBtn.classList.add('hidden');
+      navTitle.textContent = '';
+      break;
+    case 'input':
+      navbar.classList.remove('transparent');
+      backBtn.classList.remove('hidden');
+      backLabel.textContent = 'Home';
+      navTitle.textContent = modeName;
+      break;
+    case 'questions':
+      navbar.classList.remove('transparent');
+      backBtn.classList.remove('hidden');
+      backLabel.textContent = modeName;
+      navTitle.textContent = 'Personalize';
+      break;
+    case 'results':
+      navbar.classList.remove('transparent');
+      backBtn.classList.remove('hidden');
+      backLabel.textContent = 'Personalize';
+      navTitle.textContent = 'Your Suggestions';
+      break;
+  }
+}
+
+// ─── Mode Selection ───────────────────────────────────────────────────
+function selectMode(mode) {
+  state.setting = mode;
+  state.style = 'neutral';
+  state.humorType = 'balanced';
+  state.answers = {};
+  state.questions = [];
+  state.questionsMap = {};
+
+  const badge = document.getElementById('inputModeBadge');
+  badge.className = 'mode-badge ' + mode;
+  badge.textContent = mode === 'work' ? '💼 Work' : '🎉 Lifestyle';
+
+  const btn = document.getElementById('continueBtn');
+  btn.className = 'btn-primary' + (mode === 'lifestyle' ? ' lifestyle' : '');
+
+  document.getElementById('urlSection').style.display = mode === 'work' ? 'block' : 'none';
+  document.getElementById('contextInput').value = '';
+  document.getElementById('urlInput').value = '';
+  updateCharCount();
+
+  navigateTo('input');
+}
+
+// ─── Context Input ────────────────────────────────────────────────────
+function onContextInput() {
+  updateCharCount();
+  const val = document.getElementById('contextInput').value.trim();
+  document.getElementById('continueBtn').disabled = val.length === 0;
+}
+
+function updateCharCount() {
+  const len = document.getElementById('contextInput').value.length;
+  const el = document.getElementById('charCount');
+  el.textContent = len + ' / 500';
+  el.className = 'char-count' + (len > 450 ? (len >= 500 ? ' over' : ' warn') : '');
+}
+
+// ─── Proceed to Questions ─────────────────────────────────────────────
+async function proceedToQuestions() {
+  state.context = document.getElementById('contextInput').value.trim();
+  state.url = document.getElementById('urlInput').value.trim();
+  if (!state.context) return;
+
+  state.answers = {};
+  navigateTo('questions');
+  renderQuestionsLoading();
+
+  try {
+    const res = await fetch('/api/questions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ setting: state.setting, context: state.context }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to load questions');
+
+    state.questions = data.questions || [];
+    renderQuestions(state.questions);
+  } catch (err) {
+    // Graceful fallback: skip questions, go straight to generate
+    showToast('Skipping personalization…');
+    generateFromAnswers();
+  }
+}
+
+function renderQuestionsLoading() {
+  const container = document.getElementById('questionsContainer');
+  container.innerHTML = [80, 110, 95].map(w => `
+    <div class="skeleton-card">
+      <div class="skeleton-line medium" style="margin-bottom:14px"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <div class="skeleton-chip" style="width:${w}px"></div>
+        <div class="skeleton-chip" style="width:${w - 15}px"></div>
+        <div class="skeleton-chip" style="width:${w + 10}px"></div>
+        <div class="skeleton-chip" style="width:${w - 5}px"></div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('questionsGenerateBtn').style.display = 'none';
+  document.getElementById('questionsSkip').style.display = 'none';
+}
+
+function renderQuestions(questions) {
+  // Build lookup map so onclick handlers don't need to carry question text
+  // (avoids apostrophe/quote bug when question text is embedded in HTML attribute)
+  state.questionsMap = {};
+  questions.forEach(q => { state.questionsMap[q.id] = q.question; });
+
+  const container = document.getElementById('questionsContainer');
+  container.innerHTML = '';
+
+  questions.forEach(q => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    // Use data-qid on the row; chips use data-value. No question text in onclick.
+    card.innerHTML = `
+      <div class="question-text">${escapeHtml(q.question)}</div>
+      <div class="chips-row" data-qid="${escapeHtml(q.id)}">
+        ${q.options.map(opt => `
+          <button class="chip" data-value="${escapeHtml(opt)}" onclick="selectChip(this)">${escapeHtml(opt)}</button>
+        `).join('')}
+        <button class="chip chip-other" onclick="toggleOther(this)">✏️ Other</button>
+      </div>
+      <div class="other-input-row" id="other-row-${escapeHtml(q.id)}">
+        <input class="other-input" type="text" placeholder="Type your answer…"
+               data-qid="${escapeHtml(q.id)}" oninput="setCustomAnswer(this)" />
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  document.getElementById('questionsGenerateBtn').style.display = 'flex';
+  document.getElementById('questionsSkip').style.display = 'block';
+}
+
+// ─── Chip Selection (data-attribute based — no apostrophe bug) ────────
+function selectChip(chipEl) {
+  const row     = chipEl.closest('.chips-row');
+  const qId     = row.dataset.qid;
+  const question = state.questionsMap[qId];
+
+  // Deselect all chips in this question group
+  row.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+
+  // Hide "Other" input if it was open
+  const otherRow = document.getElementById('other-row-' + qId);
+  if (otherRow) {
+    otherRow.classList.remove('visible');
+    const inp = otherRow.querySelector('.other-input');
+    if (inp) inp.value = '';
+  }
+
+  chipEl.classList.add('selected');
+  state.answers[qId] = { question, answer: chipEl.dataset.value };
+}
+
+function toggleOther(btnEl) {
+  const row     = btnEl.closest('.chips-row');
+  const qId     = row.dataset.qid;
+  const otherRow = document.getElementById('other-row-' + qId);
+  const isOpen  = otherRow.classList.contains('visible');
+
+  if (isOpen) {
+    otherRow.classList.remove('visible');
+    btnEl.classList.remove('selected');
+    delete state.answers[qId];
+  } else {
+    row.querySelectorAll('.chip:not(.chip-other)').forEach(c => c.classList.remove('selected'));
+    btnEl.classList.add('selected');
+    otherRow.classList.add('visible');
+    otherRow.querySelector('.other-input').focus();
+    delete state.answers[qId];
+  }
+}
+
+function setCustomAnswer(inputEl) {
+  const qId     = inputEl.dataset.qid;
+  const question = state.questionsMap[qId];
+  const value   = inputEl.value.trim();
+  if (value) {
+    state.answers[qId] = { question, answer: value };
+  } else {
+    delete state.answers[qId];
+  }
+}
+
+// ─── Build answers map helper ─────────────────────────────────────────
+function buildAnswersMap() {
+  const map = {};
+  Object.values(state.answers).forEach(({ question, answer }) => {
+    map[question] = answer;
+  });
+  return map;
+}
+
+// ─── Generate from Answers ────────────────────────────────────────────
+async function generateFromAnswers() {
+  navigateTo('results');
+  renderLoading();
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        setting: state.setting,
+        context: state.context,
+        url: state.url || undefined,
+        style: state.style,
+        humorType: state.humorType,
+        answers: buildAnswersMap(),
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to generate suggestions.');
+
+    state.suggestions = data.suggestions;
+    state.feedbacks = {};
+    renderSuggestions();
+  } catch (err) {
+    renderError(err.message);
+  }
+}
+
+// ─── Regenerate (stays on results) ───────────────────────────────────
+async function regenerate() {
+  const regenBtn  = document.getElementById('regenBtn');
+  const regenIcon = document.getElementById('regenIcon');
+  regenBtn.disabled = true;
+  regenIcon.innerHTML = '<span class="spin">⟳</span>';
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        setting: state.setting,
+        context: state.context,
+        url: state.url || undefined,
+        style: state.style,
+        humorType: state.humorType,
+        answers: buildAnswersMap(),
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to generate suggestions.');
+
+    state.suggestions = data.suggestions;
+    state.feedbacks = {};
+    renderSuggestions();
+  } catch (err) {
+    showToast('⚠️ ' + err.message);
+  } finally {
+    regenBtn.disabled = false;
+    regenIcon.textContent = '↺';
+  }
+}
+
+// ─── Style + Humor Controls ───────────────────────────────────────────
+function setStyle(style) {
+  state.style = style;
+  document.querySelectorAll('.style-pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.style === style);
+  });
+}
+
+function setHumor(humor) {
+  state.humorType = humor;
+  document.querySelectorAll('.humor-pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.humor === humor);
+  });
+}
+
+// ─── Render: Loading ──────────────────────────────────────────────────
+function renderLoading() {
+  document.getElementById('resultsControls').style.display = 'none';
+  document.getElementById('aiDisclaimer').style.display = 'none';
+  document.getElementById('resultsMetaLeft').textContent = 'Generating…';
+  document.getElementById('resultsMetaBadge').textContent =
+    state.setting === 'work' ? '💼 Work' : '🎉 Lifestyle';
+
+  const skeleton = (n) => Array.from({length: n}, () => `
+    <div class="skeleton-card">
+      <div class="skeleton-line short" style="margin-bottom:14px"></div>
+      <div class="skeleton-line full"></div>
+      <div class="skeleton-line medium"></div>
+    </div>`).join('');
+
+  document.getElementById('resultsBody').innerHTML = `
+    <div class="results-section-header" style="padding-top:4px">💬 Ice Breakers</div>
+    ${skeleton(3)}
+    <div class="results-section-header">😄 Jokes</div>
+    ${skeleton(3)}
+  `;
+}
+
+// ─── Render: Suggestions (two separate sections) ──────────────────────
+function renderSuggestions() {
+  if (!state.suggestions?.length) {
+    renderError('No suggestions were generated. Please try again.');
+    return;
+  }
+
+  const iceBreakers = state.suggestions.filter(s => s.type === 'Ice Breaker');
+  const jokes       = state.suggestions.filter(s => s.type === 'Joke');
+
+  function makeCard(s, globalIdx) {
+    return `
+      <div class="suggestion-card">
+        <div class="card-content">${escapeHtml(s.content)}</div>
+        <div class="card-divider"></div>
+        <div class="card-actions">
+          <button class="action-btn" id="thumb-up-${globalIdx}" onclick="thumbFeedback(${globalIdx},'up')"><span class="icon">👍</span></button>
+          <button class="action-btn" id="thumb-down-${globalIdx}" onclick="thumbFeedback(${globalIdx},'down')"><span class="icon">👎</span></button>
+          <div class="action-spacer"></div>
+          <button class="action-btn" id="copy-${globalIdx}" onclick="copyContent(${globalIdx})"><span class="icon">📋</span> Copy</button>
+          <button class="report-btn" onclick="openReportModal(${globalIdx})">Report</button>
+        </div>
+      </div>`;
+  }
+
+  const ibHtml  = iceBreakers.map((s, i) => makeCard(s, state.suggestions.indexOf(s))).join('');
+  const jokHtml = jokes.map((s, i)       => makeCard(s, state.suggestions.indexOf(s))).join('');
+
+  document.getElementById('resultsBody').innerHTML = `
+    <div class="results-section results-section--ib">
+      <div class="results-section-header">
+        💬 Ice Breakers
+        <span class="count-badge">${iceBreakers.length}</span>
+      </div>
+      ${ibHtml}
+    </div>
+    <div class="results-section results-section--jokes">
+      <div class="results-section-header">
+        😄 Jokes
+        <span class="count-badge">${jokes.length}</span>
+      </div>
+      ${jokHtml}
+    </div>
+  `;
+
+  document.getElementById('resultsMetaLeft').textContent =
+    `${iceBreakers.length} ice breakers · ${jokes.length} jokes`;
+  document.getElementById('resultsMetaBadge').textContent =
+    state.setting === 'work' ? '💼 Work' : '🎉 Lifestyle';
+  document.getElementById('resultsControls').style.display = 'block';
+  document.getElementById('aiDisclaimer').style.display = 'block';
+}
+
+// ─── Render: Error ────────────────────────────────────────────────────
+function renderError(msg) {
+  document.getElementById('resultsBody').innerHTML = `
+    <div class="error-box">
+      <span class="error-icon">⚠️</span>
+      <div class="error-text">${escapeHtml(msg)}</div>
+    </div>
+  `;
+  document.getElementById('resultsMetaLeft').textContent = 'Something went wrong';
+  document.getElementById('resultsMetaBadge').textContent = '';
+  document.getElementById('resultsControls').style.display = 'block';
+  document.getElementById('regenBtn').innerHTML = '↺ Try Again';
+  document.getElementById('aiDisclaimer').style.display = 'none';
+}
+
+// ─── Actions ──────────────────────────────────────────────────────────
+function thumbFeedback(index, dir) {
+  const prev = state.feedbacks[index];
+  const upBtn   = document.getElementById('thumb-up-'   + index);
+  const downBtn = document.getElementById('thumb-down-' + index);
+
+  if (prev === dir) {
+    delete state.feedbacks[index];
+    upBtn.classList.remove('active-up');
+    downBtn.classList.remove('active-down');
+  } else {
+    state.feedbacks[index] = dir;
+    upBtn.classList.toggle('active-up',   dir === 'up');
+    downBtn.classList.toggle('active-down', dir === 'down');
+    if (dir === 'up')   downBtn.classList.remove('active-down');
+    if (dir === 'down') upBtn.classList.remove('active-up');
+  }
+}
+
+async function copyContent(index) {
+  const content = state.suggestions[index]?.content;
+  if (!content) return;
+
+  try {
+    await navigator.clipboard.writeText(content);
+  } catch {
+    const ta = document.createElement('textarea');
+    ta.value = content;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  }
+
+  const btn = document.getElementById('copy-' + index);
+  btn.classList.add('copied');
+  btn.innerHTML = '<span class="icon">✅</span> Copied!';
+  setTimeout(() => {
+    btn.classList.remove('copied');
+    btn.innerHTML = '<span class="icon">📋</span> Copy';
+  }, 2000);
+
+  showToast('Copied to clipboard!');
+}
+
+// ─── Report ───────────────────────────────────────────────────────────
+function openReportModal(index) {
+  state.reportTarget = {
+    index,
+    content: state.suggestions[index]?.content,
+    type: state.suggestions[index]?.type,
+  };
+  document.getElementById('reportModal').classList.add('open');
+}
+
+function closeReportModal(e) {
+  if (e && e.target !== document.getElementById('reportModal')) return;
+  document.getElementById('reportModal').classList.remove('open');
+  state.reportTarget = null;
+}
+
+async function submitReport(reason) {
+  document.getElementById('reportModal').classList.remove('open');
+  if (!state.reportTarget) return;
+
+  try {
+    await fetch('/api/report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        setting: state.setting,
+        context: state.context,
+        content: state.reportTarget.content,
+        type: state.reportTarget.type,
+        reason,
+      }),
+    });
+  } catch { /* fail silently */ }
+
+  showToast('✓ Report submitted. Thank you!');
+  state.reportTarget = null;
+}
+
+// ─── Toast ────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+}
+
+// ─── Utils ────────────────────────────────────────────────────────────
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// Init
+updateNavbar('mode');
+</script>
+</body>
+</html>
