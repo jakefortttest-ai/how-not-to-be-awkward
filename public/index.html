@@ -6,45 +6,56 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>How Not To Be Awkward</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap" rel="stylesheet" />
   <style>
     /* ─── Reset & Base ───────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --blue:         #007AFF;
-      --blue-light:   #E8F2FF;
-      --orange:       #FF9500;
-      --orange-light: #FFF4E0;
-      --pink:         #FF2D55;
-      --green:        #34C759;
-      --red:          #FF3B30;
+      /* Duolingo Palette */
+      --green:          #58CC02;
+      --green-dark:     #45A800;
+      --green-light:    #D7FFB8;
 
-      --bg:           #F2F2F7;
-      --card:         #FFFFFF;
-      --label:        #000000;
-      --label-2:      rgba(60,60,67,0.75);
-      --label-3:      rgba(60,60,67,0.50);
-      --separator:    rgba(60,60,67,0.29);
-      --fill-4:       rgba(120,120,128,0.08);
+      --blue:           #1CB0F6;
+      --blue-dark:      #0097D9;
+      --blue-light:     #DDF4FF;
 
-      --gray:         #8E8E93;
-      --gray-3:       #C7C7CC;
-      --gray-5:       #E5E5EA;
-      --gray-6:       #F2F2F7;
+      --orange:         #FF9600;
+      --orange-dark:    #E08600;
+      --orange-light:   #FFEACC;
 
-      --nav-h:        54px;
-      --radius-card:  16px;
-      --radius-btn:   14px;
-      --ease-ios:     cubic-bezier(0.4, 0, 0.2, 1);
+      --purple:         #CE82FF;
+      --purple-dark:    #AC6BDE;
+      --purple-light:   #F4DDFF;
+
+      --yellow:         #FFD900;
+      --red:            #FF4B4B;
+      --red-dark:       #EA2B2B;
+
+      --bg:             #FFFFFF;
+      --card:           #FFFFFF;
+      --label:          #3C3C3C;
+      --label-2:        #777777;
+      --label-3:        #AFAFAF;
+      --separator:      #E5E5E5;
+      --border:         #E5E5E5;
+      --border-deep:    #C0C0C0;
+
+      --nav-h:          56px;
+      --radius-card:    16px;
+      --radius-btn:     16px;
+      --ease-duo:       cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     html { height: 100%; }
 
     body {
       height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
-                   'Helvetica Neue', Arial, sans-serif;
-      background: var(--gray-6);
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+      background: #F7F7F7;
       -webkit-font-smoothing: antialiased;
       -webkit-tap-highlight-color: transparent;
       overflow: hidden;
@@ -58,7 +69,7 @@
       position: relative;
       overflow: hidden;
       background: var(--bg);
-      box-shadow: 0 0 60px rgba(0,0,0,0.15);
+      box-shadow: 0 0 40px rgba(0,0,0,0.12);
     }
 
     /* ─── Navigation Bar ──────────────────────────────────────── */
@@ -69,61 +80,50 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 8px;
+      padding: 0 12px;
       padding-top: env(safe-area-inset-top, 0px);
-      background: rgba(242,242,247,0.88);
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border-bottom: 0.5px solid var(--separator);
+      background: #FFFFFF;
+      border-bottom: 2px solid var(--border);
       z-index: 100;
-      transition: background 0.3s, border-color 0.3s, backdrop-filter 0.3s;
+      transition: background 0.3s, border-color 0.3s;
     }
     .navbar.transparent {
       background: transparent;
       border-bottom-color: transparent;
-      backdrop-filter: none;
-      -webkit-backdrop-filter: none;
     }
 
     .nav-back {
       display: flex;
       align-items: center;
-      gap: 1px;
+      gap: 2px;
       background: none;
       border: none;
-      color: var(--blue);
-      font-size: 17px;
-      font-weight: 400;
-      padding: 8px 8px;
+      color: var(--blue-dark);
+      font-size: 16px;
+      font-weight: 800;
+      padding: 8px;
       cursor: pointer;
       border-radius: 8px;
       transition: opacity 0.15s;
       white-space: nowrap;
       min-width: 80px;
     }
-    .nav-back:active { opacity: 0.4; }
-    .nav-back .chevron { font-size: 24px; font-weight: 200; line-height: 1; margin-right: 1px; }
+    .nav-back:active { opacity: 0.5; }
+    .nav-back .chevron { font-size: 22px; line-height: 1; }
     .nav-back.hidden { visibility: hidden; pointer-events: none; }
 
     .nav-title {
-      font-size: 17px;
-      font-weight: 600;
+      font-size: 16px;
+      font-weight: 900;
       color: var(--label);
       text-align: center;
       flex: 1;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .nav-right { min-width: 80px; }
 
-    /* ─── Views — 3-state system (FIX for back button bug) ───── */
-    /*
-     * Default (no extra class) = hidden to the RIGHT  → translateX(100%)
-     * .active                  = visible              → translateX(0)
-     * .prev                    = hidden to the LEFT   → translateX(-25%)
-     *
-     * Forward: current → .prev, next (was default) → .active
-     * Back:    current (remove .active) → default, prev (remove .prev) → .active
-     * No setTimeout needed. No class leaks.
-     */
+    /* ─── Views — 3-state system ──────────────────────────────── */
     .views-container {
       position: absolute;
       inset: 0;
@@ -143,7 +143,7 @@
       transform: translateX(100%);
       opacity: 0;
       pointer-events: none;
-      transition: transform 0.36s var(--ease-ios), opacity 0.30s var(--ease-ios);
+      transition: transform 0.36s var(--ease-duo), opacity 0.30s var(--ease-duo);
       will-change: transform;
     }
 
@@ -164,27 +164,32 @@
 
     /* ─── Home View ───────────────────────────────────────────── */
     .home-hero {
-      padding: 48px 24px 28px;
+      padding: 40px 24px 28px;
       text-align: center;
+      background: linear-gradient(180deg, #F0FFF5 0%, #FFFFFF 100%);
+      border-bottom: 2px solid var(--border);
+      margin-bottom: 24px;
     }
     .home-emoji {
-      font-size: 64px;
+      font-size: 72px;
       line-height: 1;
       margin-bottom: 16px;
       display: block;
-      animation: float 3s ease-in-out infinite;
+      animation: bounce 1.6s ease-in-out infinite;
     }
-    @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50%       { transform: translateY(-8px); }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      30%       { transform: translateY(-12px) rotate(-5deg); }
+      60%       { transform: translateY(-5px) rotate(3deg); }
     }
     .home-title {
-      font-size: 28px;
-      font-weight: 700;
+      font-size: 26px;
+      font-weight: 900;
       color: var(--label);
-      letter-spacing: -0.5px;
       line-height: 1.2;
       margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: -0.3px;
     }
     .home-subtitle {
       font-size: 15px;
@@ -192,64 +197,66 @@
       line-height: 1.5;
       max-width: 280px;
       margin: 0 auto;
+      font-weight: 600;
     }
     .section-label {
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 900;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--gray);
+      letter-spacing: 1px;
+      color: var(--label-3);
       padding: 0 20px;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
     .mode-cards {
       padding: 0 16px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
     }
     .mode-card {
       background: var(--card);
-      border-radius: var(--radius-card);
+      border-radius: 20px;
       padding: 20px;
       display: flex;
       align-items: center;
       gap: 16px;
       cursor: pointer;
-      border: none;
+      border: 2px solid var(--border);
+      border-bottom: 5px solid var(--border-deep);
       width: 100%;
       text-align: left;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.06);
-      transition: transform 0.12s, box-shadow 0.12s;
+      transition: transform 0.1s, border-bottom-width 0.1s;
       -webkit-user-select: none;
       user-select: none;
     }
     .mode-card:active {
-      transform: scale(0.97);
-      box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+      transform: translateY(3px);
+      border-bottom-width: 2px;
     }
     .mode-icon-wrap {
-      width: 56px;
-      height: 56px;
-      border-radius: 14px;
+      width: 60px;
+      height: 60px;
+      border-radius: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 28px;
+      font-size: 30px;
       flex-shrink: 0;
     }
-    .mode-icon-wrap.work      { background: linear-gradient(145deg, #34AADC, #007AFF); }
-    .mode-icon-wrap.lifestyle { background: linear-gradient(145deg, #FFB340, #FF2D55); }
+    .mode-icon-wrap.work      { background: var(--blue-light); }
+    .mode-icon-wrap.lifestyle { background: var(--orange-light); }
     .mode-info { flex: 1; min-width: 0; }
-    .mode-name { font-size: 18px; font-weight: 600; color: var(--label); margin-bottom: 3px; }
-    .mode-desc { font-size: 13px; color: var(--label-2); line-height: 1.4; }
-    .mode-arrow { font-size: 20px; color: var(--gray-3); font-weight: 300; }
+    .mode-name { font-size: 17px; font-weight: 900; color: var(--label); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.3px; }
+    .mode-desc { font-size: 13px; color: var(--label-2); line-height: 1.4; font-weight: 600; }
+    .mode-arrow { font-size: 22px; color: var(--label-3); font-weight: 900; }
     .home-disclaimer {
       font-size: 12px;
       color: var(--label-3);
       text-align: center;
-      padding: 24px 24px 0;
+      padding: 20px 24px 0;
       line-height: 1.5;
+      font-weight: 600;
     }
 
     /* ─── Input View ──────────────────────────────────────────── */
@@ -266,36 +273,39 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 14px;
+      padding: 6px 16px;
       border-radius: 100px;
-      font-size: 14px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 900;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .mode-badge.work      { background: var(--blue-light);   color: var(--blue); }
-    .mode-badge.lifestyle { background: var(--orange-light); color: #C97500; }
-    .mode-badge-sub { font-size: 14px; color: var(--label-3); }
+    .mode-badge.work      { background: var(--blue-light); color: var(--blue-dark); border: 2px solid var(--blue); }
+    .mode-badge.lifestyle { background: var(--orange-light); color: var(--orange-dark); border: 2px solid var(--orange); }
+    .mode-badge-sub { font-size: 14px; color: var(--label-3); font-weight: 700; }
 
     .form-section { margin-bottom: 24px; }
     .form-section-header {
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 900;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--gray);
+      letter-spacing: 1px;
+      color: var(--label-3);
       padding: 0 4px;
       margin-bottom: 8px;
     }
     .form-group {
       background: var(--card);
-      border-radius: var(--radius-card);
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.05), 0 0 0 0.5px rgba(0,0,0,0.06);
+      border: 2px solid var(--border);
+      border-bottom: 4px solid var(--border-deep);
     }
     .form-group-row {
       display: flex;
       align-items: center;
       padding: 14px 16px;
-      border-bottom: 0.5px solid var(--separator);
+      border-bottom: 1.5px solid var(--border);
     }
     .form-group-row:last-child { border-bottom: none; }
 
@@ -309,16 +319,17 @@
       color: var(--label);
       resize: none;
       line-height: 1.5;
+      font-weight: 600;
     }
-    textarea::placeholder, input::placeholder { color: var(--gray-3); }
+    textarea::placeholder, input::placeholder { color: var(--label-3); font-weight: 500; }
     textarea { min-height: 110px; padding: 14px 16px; display: block; }
     input[type="url"] { flex: 1; }
     .url-prefix { font-size: 15px; color: var(--label-3); margin-right: 6px; flex-shrink: 0; }
 
-    .char-count { font-size: 12px; color: var(--label-3); text-align: right; padding: 6px 4px 0; }
+    .char-count { font-size: 12px; color: var(--label-3); text-align: right; padding: 6px 4px 0; font-weight: 700; }
     .char-count.warn { color: var(--orange); }
     .char-count.over { color: var(--red); }
-    .form-hint { font-size: 12px; color: var(--label-3); padding: 8px 4px 0; line-height: 1.5; }
+    .form-hint { font-size: 12px; color: var(--label-3); padding: 8px 4px 0; line-height: 1.5; font-weight: 600; }
 
     /* ─── Primary Button ──────────────────────────────────────── */
     .btn-primary {
@@ -328,24 +339,27 @@
       gap: 8px;
       width: 100%;
       padding: 16px;
-      background: var(--blue);
+      background: var(--green);
       color: #fff;
       font-size: 17px;
-      font-weight: 600;
-      border: none;
+      font-weight: 900;
+      border: 2px solid var(--green-dark);
+      border-bottom: 5px solid var(--green-dark);
       border-radius: var(--radius-btn);
       cursor: pointer;
       font-family: inherit;
-      transition: transform 0.12s, opacity 0.12s;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: transform 0.1s, border-bottom-width 0.1s;
       -webkit-user-select: none;
       user-select: none;
-      box-shadow: 0 4px 16px rgba(0,122,255,0.35);
     }
-    .btn-primary:active { transform: scale(0.97); opacity: 0.85; }
-    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+    .btn-primary:active { transform: translateY(3px); border-bottom-width: 2px; }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; border-bottom-width: 5px; }
     .btn-primary.lifestyle {
-      background: linear-gradient(135deg, #FF9500, #FF2D55);
-      box-shadow: 0 4px 16px rgba(255,45,85,0.30);
+      background: var(--orange);
+      border-color: var(--orange-dark);
+      border-bottom-color: var(--orange-dark);
     }
 
     /* ─── Questions View ──────────────────────────────────────── */
@@ -353,24 +367,28 @@
       padding: 4px 4px 20px;
     }
     .questions-intro-title {
-      font-size: 20px;
-      font-weight: 700;
+      font-size: 22px;
+      font-weight: 900;
       color: var(--label);
       margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: -0.3px;
     }
     .questions-intro-sub {
       font-size: 14px;
       color: var(--label-2);
       line-height: 1.5;
+      font-weight: 600;
     }
 
     .question-card {
       background: var(--card);
-      border-radius: var(--radius-card);
+      border-radius: 16px;
       padding: 16px;
-      margin-bottom: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05), 0 0 0 0.5px rgba(0,0,0,0.06);
-      animation: cardIn 0.35s var(--ease-ios) both;
+      margin-bottom: 14px;
+      border: 2px solid var(--border);
+      border-bottom: 4px solid var(--border-deep);
+      animation: cardIn 0.35s var(--ease-duo) both;
     }
     .question-card:nth-child(1) { animation-delay: 0.04s; }
     .question-card:nth-child(2) { animation-delay: 0.10s; }
@@ -384,7 +402,7 @@
 
     .question-text {
       font-size: 16px;
-      font-weight: 600;
+      font-weight: 800;
       color: var(--label);
       margin-bottom: 12px;
       line-height: 1.35;
@@ -397,26 +415,27 @@
     }
 
     .chip {
-      padding: 8px 14px;
-      border-radius: 100px;
-      border: 1.5px solid var(--gray-5);
-      background: var(--gray-6);
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: 2px solid var(--border);
+      border-bottom: 4px solid var(--border-deep);
+      background: var(--card);
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 700;
       color: var(--label-2);
       cursor: pointer;
       font-family: inherit;
-      transition: border-color 0.15s, background 0.15s, color 0.15s, transform 0.1s;
+      transition: transform 0.1s, border-bottom-width 0.1s, border-color 0.15s, background 0.15s, color 0.15s;
       -webkit-user-select: none;
       user-select: none;
       line-height: 1.2;
     }
-    .chip:active { transform: scale(0.94); }
+    .chip:active { transform: translateY(2px); border-bottom-width: 2px; }
     .chip.selected {
       border-color: var(--blue);
+      border-bottom-color: var(--blue-dark);
       background: var(--blue-light);
-      color: var(--blue);
-      font-weight: 600;
+      color: var(--blue-dark);
     }
     .chip.chip-other {
       border-style: dashed;
@@ -424,9 +443,10 @@
     }
     .chip.chip-other.selected {
       border-color: var(--blue);
+      border-bottom-color: var(--blue-dark);
       border-style: solid;
       background: var(--blue-light);
-      color: var(--blue);
+      color: var(--blue-dark);
     }
 
     .other-input-row {
@@ -436,16 +456,17 @@
     .other-input-row.visible { display: block; }
     .other-input {
       width: 100%;
-      background: var(--gray-6);
-      border: 1.5px solid var(--blue);
-      border-radius: 10px;
+      background: var(--bg);
+      border: 2px solid var(--blue);
+      border-radius: 12px;
       padding: 10px 14px;
       font-family: inherit;
       font-size: 15px;
       color: var(--label);
       outline: none;
+      font-weight: 600;
     }
-    .other-input::placeholder { color: var(--gray-3); }
+    .other-input::placeholder { color: var(--label-3); }
 
     .questions-skip {
       text-align: center;
@@ -456,39 +477,40 @@
     .questions-skip button {
       background: none;
       border: none;
-      color: var(--blue);
+      color: var(--blue-dark);
       font-size: 14px;
       font-family: inherit;
       cursor: pointer;
       padding: 4px 8px;
+      font-weight: 800;
     }
     .questions-skip button:active { opacity: 0.5; }
 
     /* ─── Results Controls (tone + humor) ────────────────────── */
     .controls-block {
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
     .controls-label {
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 900;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--gray);
+      letter-spacing: 1px;
+      color: var(--label-3);
       padding: 0 2px;
       margin-bottom: 8px;
     }
     .pills-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 7px;
+      gap: 8px;
     }
     .humor-pill {
-      padding: 7px 13px;
+      padding: 8px 14px;
       border-radius: 100px;
-      border: 1.5px solid var(--gray-5);
+      border: 2px solid var(--border);
       background: var(--card);
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 700;
       color: var(--label-2);
       cursor: pointer;
       font-family: inherit;
@@ -498,31 +520,32 @@
     }
     .humor-pill:active { transform: scale(0.94); }
     .humor-pill.active {
-      border-color: var(--purple, #AF52DE);
-      background: rgba(175,82,222,0.10);
-      color: var(--purple, #AF52DE);
-      font-weight: 600;
+      border-color: var(--purple-dark);
+      background: var(--purple-light);
+      color: var(--purple-dark);
     }
     #resultsControls { margin-bottom: 20px; }
     #resultsControls .btn-outline { margin-top: 14px; }
 
     /* ─── Results Section Headers ─────────────────────────────── */
     .results-section-header {
-      font-size: 17px;
-      font-weight: 700;
+      font-size: 15px;
+      font-weight: 900;
       color: var(--label);
       padding: 4px 2px 12px;
       display: flex;
       align-items: center;
       gap: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .results-section-header .count-badge {
-      font-size: 12px;
-      font-weight: 600;
-      padding: 2px 8px;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 3px 10px;
       border-radius: 100px;
-      background: var(--fill-4);
-      color: var(--label-3);
+      background: var(--border);
+      color: var(--label-2);
     }
     .results-section + .results-section {
       margin-top: 8px;
@@ -536,26 +559,29 @@
       padding: 0 4px;
       margin-bottom: 16px;
     }
-    .results-meta-left { font-size: 14px; color: var(--label-2); }
+    .results-meta-left { font-size: 14px; color: var(--label-2); font-weight: 700; }
     .results-meta-badge {
       display: inline-flex;
       align-items: center;
-      padding: 4px 10px;
+      padding: 4px 12px;
       border-radius: 100px;
-      font-size: 12px;
-      font-weight: 600;
-      background: var(--fill-4);
+      font-size: 11px;
+      font-weight: 900;
+      background: var(--border);
       color: var(--label-2);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     /* ─── Suggestion Card ─────────────────────────────────────── */
     .suggestion-card {
       background: var(--card);
-      border-radius: var(--radius-card);
+      border-radius: 16px;
       margin-bottom: 14px;
       overflow: hidden;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.06), 0 0 0 0.5px rgba(0,0,0,0.06);
-      animation: cardIn 0.4s var(--ease-ios) both;
+      border: 2px solid var(--border);
+      border-bottom: 5px solid var(--border-deep);
+      animation: cardIn 0.4s var(--ease-duo) both;
     }
     .suggestion-card:nth-child(1) { animation-delay: 0.05s; }
     .suggestion-card:nth-child(2) { animation-delay: 0.12s; }
@@ -571,30 +597,32 @@
       display: inline-flex;
       align-items: center;
       gap: 5px;
-      padding: 4px 10px;
+      padding: 4px 12px;
       border-radius: 100px;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.2px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
-    .type-badge.icebreaker { background: var(--blue-light); color: var(--blue); }
-    .type-badge.joke       { background: var(--orange-light); color: #C97500; }
-    .card-number { font-size: 12px; color: var(--label-3); font-weight: 500; }
+    .type-badge.icebreaker { background: var(--blue-light); color: var(--blue-dark); }
+    .type-badge.joke       { background: var(--orange-light); color: var(--orange-dark); }
+    .card-number { font-size: 12px; color: var(--label-3); font-weight: 700; }
 
-    .card-content { padding: 12px 16px 16px; font-size: 16px; color: var(--label); line-height: 1.55; }
-    .card-divider { height: 0.5px; background: var(--separator); margin: 0 16px; }
+    .card-content { padding: 12px 16px 16px; font-size: 16px; color: var(--label); line-height: 1.55; font-weight: 600; }
+    .card-divider { height: 2px; background: var(--border); margin: 0 16px; }
 
     .card-actions { display: flex; align-items: center; padding: 10px 12px; gap: 4px; }
     .action-btn {
       display: flex;
       align-items: center;
       gap: 4px;
-      padding: 7px 10px;
+      padding: 7px 12px;
       background: none;
-      border: none;
-      border-radius: 8px;
+      border: 2px solid transparent;
+      border-radius: 10px;
       cursor: pointer;
       font-size: 13px;
+      font-weight: 700;
       color: var(--label-2);
       font-family: inherit;
       transition: background 0.15s, transform 0.1s, color 0.15s;
@@ -603,9 +631,9 @@
     }
     .action-btn:active { transform: scale(0.92); }
     .action-btn .icon { font-size: 16px; }
-    .action-btn.active-up   { color: var(--green); background: rgba(52,199,89,0.10); }
-    .action-btn.active-down { color: var(--red);   background: rgba(255,59,48,0.10); }
-    .action-btn.copied      { color: var(--green); background: rgba(52,199,89,0.10); }
+    .action-btn.active-up   { color: var(--green-dark); background: var(--green-light); }
+    .action-btn.active-down { color: var(--red-dark);   background: rgba(255,75,75,0.10); }
+    .action-btn.copied      { color: var(--green-dark); background: var(--green-light); }
     .action-spacer { flex: 1; }
     .report-btn {
       padding: 6px 10px;
@@ -617,28 +645,29 @@
       font-family: inherit;
       border-radius: 6px;
       transition: color 0.15s;
+      font-weight: 700;
     }
     .report-btn:hover { color: var(--red); }
 
     /* ─── Style Selector ──────────────────────────────────────── */
     .style-section { margin: 24px 0 16px; }
     .style-section-header {
-      font-size: 13px;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 900;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--gray);
+      letter-spacing: 1px;
+      color: var(--label-3);
       padding: 0 4px;
       margin-bottom: 10px;
     }
     .style-pills { display: flex; gap: 8px; flex-wrap: wrap; }
     .style-pill {
-      padding: 8px 16px;
+      padding: 9px 18px;
       border-radius: 100px;
-      border: 1.5px solid var(--gray-5);
+      border: 2px solid var(--border);
       background: var(--card);
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 700;
       color: var(--label-2);
       cursor: pointer;
       font-family: inherit;
@@ -647,7 +676,7 @@
       user-select: none;
     }
     .style-pill:active { transform: scale(0.95); }
-    .style-pill.active { border-color: var(--blue); background: var(--blue-light); color: var(--blue); font-weight: 600; }
+    .style-pill.active { border-color: var(--blue-dark); background: var(--blue-light); color: var(--blue-dark); }
 
     /* ─── Outline Button (Regenerate) ─────────────────────────── */
     .btn-outline {
@@ -658,44 +687,49 @@
       width: 100%;
       padding: 14px;
       background: var(--card);
-      color: var(--blue);
+      color: var(--blue-dark);
       font-size: 16px;
-      font-weight: 600;
-      border: 1.5px solid var(--gray-5);
+      font-weight: 900;
+      border: 2px solid var(--blue);
+      border-bottom: 5px solid var(--blue-dark);
       border-radius: var(--radius-btn);
       cursor: pointer;
       font-family: inherit;
-      transition: transform 0.12s, background 0.12s;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.05);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: transform 0.1s, border-bottom-width 0.1s, background 0.12s;
       -webkit-user-select: none;
       user-select: none;
     }
-    .btn-outline:active { transform: scale(0.97); background: var(--gray-6); }
-    .btn-outline:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-outline:active { transform: translateY(3px); border-bottom-width: 2px; background: var(--blue-light); }
+    .btn-outline:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 
     .ai-disclaimer {
       margin-top: 20px;
       padding: 12px 16px;
-      background: var(--fill-4);
-      border-radius: 10px;
+      background: #F7F7F7;
+      border-radius: 12px;
+      border: 2px solid var(--border);
       font-size: 12px;
       color: var(--label-3);
       line-height: 1.5;
       text-align: center;
+      font-weight: 600;
     }
 
     /* ─── Skeleton Loading ────────────────────────────────────── */
     .skeleton-card {
       background: var(--card);
-      border-radius: var(--radius-card);
+      border-radius: 16px;
       margin-bottom: 12px;
       padding: 16px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      border: 2px solid var(--border);
+      border-bottom: 4px solid var(--border-deep);
     }
     .skeleton-line {
       height: 12px;
       border-radius: 6px;
-      background: linear-gradient(90deg, var(--gray-5) 0%, var(--gray-6) 50%, var(--gray-5) 100%);
+      background: linear-gradient(90deg, #F0F0F0 0%, #F8F8F8 50%, #F0F0F0 100%);
       background-size: 200% 100%;
       animation: shimmer 1.4s ease-in-out infinite;
       margin-bottom: 10px;
@@ -706,9 +740,9 @@
     .skeleton-line.full   { width: 100%; }
     .skeleton-chip {
       display: inline-block;
-      height: 34px;
-      border-radius: 100px;
-      background: linear-gradient(90deg, var(--gray-5) 0%, var(--gray-6) 50%, var(--gray-5) 100%);
+      height: 36px;
+      border-radius: 12px;
+      background: linear-gradient(90deg, #F0F0F0 0%, #F8F8F8 50%, #F0F0F0 100%);
       background-size: 200% 100%;
       animation: shimmer 1.4s ease-in-out infinite;
       margin-right: 8px;
@@ -721,9 +755,9 @@
 
     /* ─── Error State ─────────────────────────────────────────── */
     .error-box {
-      background: rgba(255,59,48,0.08);
-      border: 1px solid rgba(255,59,48,0.2);
-      border-radius: 12px;
+      background: rgba(255,75,75,0.08);
+      border: 2px solid rgba(255,75,75,0.3);
+      border-radius: 16px;
       padding: 16px;
       margin-bottom: 16px;
       display: flex;
@@ -731,7 +765,7 @@
       align-items: flex-start;
     }
     .error-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
-    .error-text { font-size: 14px; color: var(--red); line-height: 1.5; flex: 1; }
+    .error-text { font-size: 14px; color: var(--red); line-height: 1.5; flex: 1; font-weight: 700; }
 
     /* ─── Toast ───────────────────────────────────────────────── */
     #toast {
@@ -739,12 +773,12 @@
       bottom: calc(28px + env(safe-area-inset-bottom, 0px));
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(0,0,0,0.78);
+      background: #3C3C3C;
       color: #fff;
-      padding: 10px 20px;
+      padding: 10px 24px;
       border-radius: 100px;
       font-size: 14px;
-      font-weight: 500;
+      font-weight: 700;
       white-space: nowrap;
       pointer-events: none;
       z-index: 999;
@@ -768,21 +802,24 @@
     .modal-overlay.open { opacity: 1; pointer-events: all; }
     .modal-sheet {
       background: var(--card);
-      border-radius: 20px 20px 0 0;
+      border-radius: 24px 24px 0 0;
       width: 100%;
       padding: 12px 0 calc(24px + env(safe-area-inset-bottom, 0px));
       transform: translateY(100%);
-      transition: transform 0.35s var(--ease-ios);
+      transition: transform 0.35s var(--ease-duo);
+      border-top: 2px solid var(--border);
     }
     .modal-overlay.open .modal-sheet { transform: translateY(0); }
-    .modal-handle { width: 36px; height: 4px; background: var(--gray-3); border-radius: 2px; margin: 0 auto 16px; }
+    .modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
     .modal-title {
-      font-size: 17px;
-      font-weight: 600;
+      font-size: 15px;
+      font-weight: 900;
       text-align: center;
       padding: 0 24px 16px;
       color: var(--label);
-      border-bottom: 0.5px solid var(--separator);
+      border-bottom: 2px solid var(--border);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .modal-option {
       display: flex;
@@ -795,27 +832,30 @@
       text-align: left;
       font-family: inherit;
       font-size: 16px;
+      font-weight: 700;
       color: var(--label);
       cursor: pointer;
-      border-bottom: 0.5px solid var(--separator);
+      border-bottom: 1.5px solid var(--border);
       transition: background 0.12s;
     }
     .modal-option:last-child { border-bottom: none; }
-    .modal-option:active { background: var(--fill-4); }
+    .modal-option:active { background: #F7F7F7; }
     .modal-option .opt-icon { font-size: 20px; }
     .modal-cancel {
       display: block;
       width: calc(100% - 32px);
       margin: 12px 16px 0;
       padding: 16px;
-      background: var(--gray-6);
-      border: none;
-      border-radius: 14px;
+      background: #F7F7F7;
+      border: 2px solid var(--border);
+      border-radius: 16px;
       font-family: inherit;
-      font-size: 17px;
-      font-weight: 600;
-      color: var(--blue);
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--label-2);
       cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
       transition: opacity 0.12s;
     }
     .modal-cancel:active { opacity: 0.6; }
@@ -826,6 +866,150 @@
 
     .mt-16 { margin-top: 16px; }
     .hidden { display: none !important; }
+
+    /* ─── Results Celebration Banner ─────────────────────────── */
+    .results-banner {
+      background: linear-gradient(135deg, var(--green) 0%, #45A800 100%);
+      border-radius: 20px;
+      padding: 18px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border: 2px solid var(--green-dark);
+      border-bottom: 5px solid var(--green-dark);
+    }
+    .results-banner-emoji { font-size: 44px; line-height: 1; flex-shrink: 0; animation: bounce 1.8s ease-in-out infinite; }
+    .results-banner-text { flex: 1; }
+    .results-banner-title { font-size: 20px; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2; }
+    .results-banner-sub { font-size: 13px; color: rgba(255,255,255,0.85); font-weight: 700; margin-top: 3px; }
+    .results-banner.loading { background: linear-gradient(135deg, #AFAFAF, #8A8A8A); border-color: #777; border-bottom-color: #555; }
+    .results-banner.loading .results-banner-emoji { animation: spin 1.2s linear infinite; }
+
+    /* ─── Section Banners ─────────────────────────────────────── */
+    .section-banner {
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 2px solid;
+      border-bottom: 4px solid;
+    }
+    .section-banner.ib   { background: var(--blue-light);   border-color: var(--blue);   border-bottom-color: var(--blue-dark); }
+    .section-banner.joke { background: var(--orange-light); border-color: var(--orange); border-bottom-color: var(--orange-dark); }
+    .section-banner-emoji { font-size: 30px; line-height: 1; flex-shrink: 0; }
+    .section-banner-info { flex: 1; }
+    .section-banner-title { font-size: 15px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; line-height: 1.2; }
+    .section-banner.ib   .section-banner-title { color: var(--blue-dark); }
+    .section-banner.joke .section-banner-title { color: var(--orange-dark); }
+    .section-banner-sub { font-size: 12px; font-weight: 700; margin-top: 2px; }
+    .section-banner.ib   .section-banner-sub { color: var(--blue); }
+    .section-banner.joke .section-banner-sub { color: var(--orange); }
+    .section-count-pill {
+      font-size: 13px; font-weight: 900;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .section-banner.ib   .section-count-pill { background: var(--blue);   color: #fff; }
+    .section-banner.joke .section-count-pill { background: var(--orange); color: #fff; }
+
+    /* ─── Redesigned Suggestion Cards ────────────────────────── */
+    .suggestion-card.ib   { border-left: 5px solid var(--blue); }
+    .suggestion-card.joke { border-left: 5px solid var(--orange); }
+
+    .card-footer {
+      display: flex; align-items: center;
+      padding: 10px 14px; gap: 8px;
+      border-top: 2px solid var(--border);
+    }
+    .card-footer-spacer { flex: 1; }
+    .thumb-group { display: flex; gap: 4px; }
+    .thumb-btn {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid var(--border);
+      border-bottom: 3px solid var(--border-deep);
+      border-radius: 10px;
+      background: var(--card); font-size: 16px; cursor: pointer;
+      transition: transform 0.1s, border-bottom-width 0.1s, border-color 0.15s, background 0.15s;
+    }
+    .thumb-btn:active { transform: translateY(2px); border-bottom-width: 1px; }
+    .thumb-btn.active-up   { border-color: var(--green-dark); background: var(--green-light); }
+    .thumb-btn.active-down { border-color: var(--red-dark);   background: rgba(255,75,75,0.10); }
+
+    .copy-btn-big {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 16px;
+      background: var(--green); color: #fff;
+      border: 2px solid var(--green-dark);
+      border-bottom: 3px solid var(--green-dark);
+      border-radius: 10px;
+      font-size: 13px; font-weight: 800;
+      cursor: pointer; font-family: inherit;
+      text-transform: uppercase; letter-spacing: 0.3px;
+      transition: transform 0.1s, border-bottom-width 0.1s, background 0.12s;
+      -webkit-user-select: none; user-select: none; white-space: nowrap;
+    }
+    .copy-btn-big:active { transform: translateY(2px); border-bottom-width: 1px; }
+    .copy-btn-big.copied { background: var(--green-light); border-color: var(--green); color: var(--green-dark); }
+
+    /* ─── Home: Floaties + How-It-Works ──────────────────────── */
+    .hero-floaties { display: flex; justify-content: center; gap: 10px; margin-bottom: 10px; font-size: 26px; }
+    .hero-floaties span:nth-child(1) { animation: bounce 1.4s 0.0s ease-in-out infinite; }
+    .hero-floaties span:nth-child(2) { animation: bounce 1.4s 0.2s ease-in-out infinite; }
+    .hero-floaties span:nth-child(3) { animation: bounce 1.4s 0.4s ease-in-out infinite; }
+    .hero-floaties span:nth-child(4) { animation: bounce 1.4s 0.6s ease-in-out infinite; }
+    .hero-floaties span:nth-child(5) { animation: bounce 1.4s 0.8s ease-in-out infinite; }
+
+    .how-it-works {
+      display: flex; align-items: flex-start; justify-content: center;
+      gap: 4px; padding: 16px 16px 4px;
+    }
+    .how-step { display: flex; flex-direction: column; align-items: center; gap: 5px; flex: 1; max-width: 86px; }
+    .how-step-emoji { font-size: 26px; }
+    .how-step-num {
+      font-size: 10px; font-weight: 900; color: #fff;
+      background: var(--green); width: 18px; height: 18px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    }
+    .how-step-label { font-size: 11px; font-weight: 800; color: var(--label-2); text-align: center; line-height: 1.3; }
+    .how-step-arrow { font-size: 18px; color: var(--label-3); padding-top: 14px; }
+
+    /* ─── Input View Tip Banner ───────────────────────────────── */
+    .input-tip-banner {
+      display: flex; align-items: center; gap: 10px;
+      background: #FFFBE6; border-radius: 12px;
+      padding: 10px 14px; margin-bottom: 16px;
+      border: 2px solid #FFD900; border-bottom: 3px solid #D4B800;
+    }
+    .input-tip-emoji { font-size: 20px; flex-shrink: 0; }
+    .input-tip-text { font-size: 13px; font-weight: 700; color: #6B5000; }
+
+    /* ─── Questions Mascot ────────────────────────────────────── */
+    .questions-mascot { font-size: 52px; text-align: center; margin-bottom: 10px; display: block; }
+
+    /* ─── Card replacement pop-in ─────────────────────────────── */
+    /* Fade-out is done via inline transition in JS (avoids the `forwards`
+       fill snap-back that causes the double-show).
+       .replaced is never removed — so the base cardIn never restarts. */
+    @keyframes cardPopIn {
+      0%   { opacity: 0; transform: translateY(18px); box-shadow: 0 0 0 3px var(--green); }
+      55%  { opacity: 1; transform: translateY(0);    box-shadow: 0 0 0 3px var(--green); }
+      100% { opacity: 1; transform: translateY(0);    box-shadow: none; }
+    }
+    .suggestion-card.replaced {
+      animation: cardPopIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+
+    /* ─── Sticker strip ───────────────────────────────────────── */
+    .sticker-strip {
+      display: flex; justify-content: center; gap: 6px;
+      padding: 12px 0 0; font-size: 22px;
+      filter: saturate(1.2);
+    }
   </style>
 </head>
 <body>
@@ -847,7 +1031,9 @@
     <!-- ══════════════════════════════════════════ -->
     <div class="view active" id="view-mode">
       <div class="home-hero">
-        <span class="home-emoji">😬</span>
+        <div class="hero-floaties">
+          <span>🎤</span><span>🎭</span><span>😬</span><span>✨</span><span>💬</span>
+        </div>
         <h1 class="home-title">How Not To Be Awkward</h1>
         <p class="home-subtitle">AI-powered ice breakers &amp; jokes, crafted for your exact situation.</p>
       </div>
@@ -872,9 +1058,28 @@
         </button>
       </div>
 
+      <div class="how-it-works">
+        <div class="how-step">
+          <span class="how-step-emoji">📝</span>
+          <span class="how-step-num">1</span>
+          <span class="how-step-label">Describe your situation</span>
+        </div>
+        <span class="how-step-arrow">→</span>
+        <div class="how-step">
+          <span class="how-step-emoji">🤔</span>
+          <span class="how-step-num">2</span>
+          <span class="how-step-label">Quick personality quiz</span>
+        </div>
+        <span class="how-step-arrow">→</span>
+        <div class="how-step">
+          <span class="how-step-emoji">🎯</span>
+          <span class="how-step-num">3</span>
+          <span class="how-step-label">Get killer lines</span>
+        </div>
+      </div>
+
       <p class="home-disclaimer">
-        All content is AI-generated and safety-reviewed.<br />
-        We never store personal information about others.
+        All content is AI-generated · We never store personal info
       </p>
     </div>
 
@@ -887,6 +1092,11 @@
         <div class="mode-badge-row">
           <span class="mode-badge" id="inputModeBadge"></span>
           <span class="mode-badge-sub">Describe your situation</span>
+        </div>
+
+        <div class="input-tip-banner">
+          <span class="input-tip-emoji">💡</span>
+          <span class="input-tip-text">More detail = way better suggestions. Be specific!</span>
         </div>
 
         <div class="form-section">
@@ -933,6 +1143,7 @@
       <div class="view-content">
 
         <div class="questions-intro">
+          <span class="questions-mascot">🧠</span>
           <div class="questions-intro-title">Tell us a bit more</div>
           <div class="questions-intro-sub">
             A few quick taps will help us craft perfectly tailored suggestions.
@@ -959,11 +1170,8 @@
     <div class="view" id="view-results">
       <div class="view-content">
 
-        <!-- Meta row -->
-        <div class="results-meta">
-          <span class="results-meta-left" id="resultsMetaLeft"></span>
-          <span class="results-meta-badge" id="resultsMetaBadge"></span>
-        </div>
+        <!-- Celebration banner -->
+        <div id="resultsBanner" style="display:none"></div>
 
         <!-- ── Controls (shown after generation) ── -->
         <div id="resultsControls" style="display:none">
@@ -986,6 +1194,8 @@
               <button class="humor-pill" data-humor="selfDeprecating" onclick="setHumor('selfDeprecating')">🙈 Self-Deprecating</button>
               <button class="humor-pill" data-humor="wordplay"        onclick="setHumor('wordplay')"      >🔤 Wordplay & Puns</button>
               <button class="humor-pill" data-humor="oneLiners"       onclick="setHumor('oneLiners')"     >⚡ Witty One-Liners</button>
+              <button class="humor-pill" data-humor="misdirect"      onclick="setHumor('misdirect')"     >🪄 Misdirect</button>
+              <button class="humor-pill" data-humor="popCulture"     onclick="setHumor('popCulture')"    >🌐 Pop / Current Events</button>
             </div>
           </div>
           <button class="btn-outline" id="regenBtn" onclick="regenerate()">
@@ -1380,9 +1590,16 @@ function setHumor(humor) {
 function renderLoading() {
   document.getElementById('resultsControls').style.display = 'none';
   document.getElementById('aiDisclaimer').style.display = 'none';
-  document.getElementById('resultsMetaLeft').textContent = 'Generating…';
-  document.getElementById('resultsMetaBadge').textContent =
-    state.setting === 'work' ? '💼 Work' : '🎉 Lifestyle';
+
+  document.getElementById('resultsBanner').innerHTML = `
+    <div class="results-banner loading">
+      <span class="results-banner-emoji">⏳</span>
+      <div class="results-banner-text">
+        <div class="results-banner-title">Cooking up your lines…</div>
+        <div class="results-banner-sub">AI is working its magic ✨</div>
+      </div>
+    </div>`;
+  document.getElementById('resultsBanner').style.display = 'block';
 
   const skeleton = (n) => Array.from({length: n}, () => `
     <div class="skeleton-card">
@@ -1392,9 +1609,21 @@ function renderLoading() {
     </div>`).join('');
 
   document.getElementById('resultsBody').innerHTML = `
-    <div class="results-section-header" style="padding-top:4px">💬 Ice Breakers</div>
+    <div class="section-banner ib">
+      <span class="section-banner-emoji">💬</span>
+      <div class="section-banner-info">
+        <div class="section-banner-title">Ice Breakers</div>
+        <div class="section-banner-sub">Loading…</div>
+      </div>
+    </div>
     ${skeleton(3)}
-    <div class="results-section-header">😄 Jokes</div>
+    <div class="section-banner joke" style="margin-top:8px">
+      <span class="section-banner-emoji">😂</span>
+      <div class="section-banner-info">
+        <div class="section-banner-title">Jokes</div>
+        <div class="section-banner-sub">Loading…</div>
+      </div>
+    </div>
     ${skeleton(3)}
   `;
 }
@@ -1409,59 +1638,78 @@ function renderSuggestions() {
   const iceBreakers = state.suggestions.filter(s => s.type === 'Ice Breaker');
   const jokes       = state.suggestions.filter(s => s.type === 'Joke');
 
-  function makeCard(s, globalIdx) {
+  const bannerEmojis = ['🎉', '🔥', '💥', '🎯', '⚡'];
+  const bannerEmoji  = bannerEmojis[Math.floor(Math.random() * bannerEmojis.length)];
+  document.getElementById('resultsBanner').innerHTML = `
+    <div class="results-banner">
+      <span class="results-banner-emoji">${bannerEmoji}</span>
+      <div class="results-banner-text">
+        <div class="results-banner-title">You've got lines!</div>
+        <div class="results-banner-sub">${iceBreakers.length} ice breakers · ${jokes.length} jokes — go crush it 💪</div>
+      </div>
+    </div>`;
+  document.getElementById('resultsBanner').style.display = 'block';
+
+  function makeCard(s, globalIdx, localIdx, typeClass) {
     return `
-      <div class="suggestion-card">
+      <div class="suggestion-card ${typeClass}">
         <div class="card-content">${escapeHtml(s.content)}</div>
-        <div class="card-divider"></div>
-        <div class="card-actions">
-          <button class="action-btn" id="thumb-up-${globalIdx}" onclick="thumbFeedback(${globalIdx},'up')"><span class="icon">👍</span></button>
-          <button class="action-btn" id="thumb-down-${globalIdx}" onclick="thumbFeedback(${globalIdx},'down')"><span class="icon">👎</span></button>
-          <div class="action-spacer"></div>
-          <button class="action-btn" id="copy-${globalIdx}" onclick="copyContent(${globalIdx})"><span class="icon">📋</span> Copy</button>
-          <button class="report-btn" onclick="openReportModal(${globalIdx})">Report</button>
+        <div class="card-footer">
+          <div class="thumb-group">
+            <button class="thumb-btn" id="thumb-up-${globalIdx}"   onclick="thumbFeedback(${globalIdx},'up')">👍</button>
+            <button class="thumb-btn" id="thumb-down-${globalIdx}" onclick="thumbFeedback(${globalIdx},'down')">👎</button>
+          </div>
+          <div class="card-footer-spacer"></div>
+          <button class="copy-btn-big" id="copy-${globalIdx}" onclick="copyContent(${globalIdx})">📋 Copy</button>
+          <button class="report-btn" onclick="openReportModal(${globalIdx})">⚑</button>
         </div>
       </div>`;
   }
 
-  const ibHtml  = iceBreakers.map((s, i) => makeCard(s, state.suggestions.indexOf(s))).join('');
-  const jokHtml = jokes.map((s, i)       => makeCard(s, state.suggestions.indexOf(s))).join('');
+  const ibHtml  = iceBreakers.map((s, i) => makeCard(s, state.suggestions.indexOf(s), i, 'ib')).join('');
+  const jokHtml = jokes.map((s, i)       => makeCard(s, state.suggestions.indexOf(s), i, 'joke')).join('');
 
   document.getElementById('resultsBody').innerHTML = `
     <div class="results-section results-section--ib">
-      <div class="results-section-header">
-        💬 Ice Breakers
-        <span class="count-badge">${iceBreakers.length}</span>
+      <div class="section-banner ib">
+        <span class="section-banner-emoji">💬</span>
+        <div class="section-banner-info">
+          <div class="section-banner-title">Ice Breakers</div>
+          <div class="section-banner-sub">Kick off the conversation</div>
+        </div>
+        <span class="section-count-pill">${iceBreakers.length}</span>
       </div>
       ${ibHtml}
     </div>
     <div class="results-section results-section--jokes">
-      <div class="results-section-header">
-        😄 Jokes
-        <span class="count-badge">${jokes.length}</span>
+      <div class="section-banner joke">
+        <span class="section-banner-emoji">😂</span>
+        <div class="section-banner-info">
+          <div class="section-banner-title">Jokes</div>
+          <div class="section-banner-sub">Get the laughs rolling</div>
+        </div>
+        <span class="section-count-pill">${jokes.length}</span>
       </div>
       ${jokHtml}
     </div>
   `;
 
-  document.getElementById('resultsMetaLeft').textContent =
-    `${iceBreakers.length} ice breakers · ${jokes.length} jokes`;
-  document.getElementById('resultsMetaBadge').textContent =
-    state.setting === 'work' ? '💼 Work' : '🎉 Lifestyle';
   document.getElementById('resultsControls').style.display = 'block';
   document.getElementById('aiDisclaimer').style.display = 'block';
 }
 
 // ─── Render: Error ────────────────────────────────────────────────────
 function renderError(msg) {
-  document.getElementById('resultsBody').innerHTML = `
-    <div class="error-box">
-      <span class="error-icon">⚠️</span>
-      <div class="error-text">${escapeHtml(msg)}</div>
-    </div>
-  `;
-  document.getElementById('resultsMetaLeft').textContent = 'Something went wrong';
-  document.getElementById('resultsMetaBadge').textContent = '';
+  document.getElementById('resultsBanner').innerHTML = `
+    <div class="results-banner" style="background:linear-gradient(135deg,#FF4B4B,#c93b3b);border-color:#c93b3b;">
+      <span class="results-banner-emoji" style="animation:none">😬</span>
+      <div class="results-banner-text">
+        <div class="results-banner-title">Oops!</div>
+        <div class="results-banner-sub">${escapeHtml(msg)}</div>
+      </div>
+    </div>`;
+  document.getElementById('resultsBanner').style.display = 'block';
+  document.getElementById('resultsBody').innerHTML = '';
   document.getElementById('resultsControls').style.display = 'block';
   document.getElementById('regenBtn').innerHTML = '↺ Try Again';
   document.getElementById('aiDisclaimer').style.display = 'none';
@@ -1469,9 +1717,13 @@ function renderError(msg) {
 
 // ─── Actions ──────────────────────────────────────────────────────────
 function thumbFeedback(index, dir) {
-  const prev = state.feedbacks[index];
+  const prev    = state.feedbacks[index];
   const upBtn   = document.getElementById('thumb-up-'   + index);
   const downBtn = document.getElementById('thumb-down-' + index);
+  const card    = downBtn?.closest('.suggestion-card');
+
+  // Prevent double-trigger while a replacement is already in flight
+  if (card?.dataset.replacing) return;
 
   if (prev === dir) {
     delete state.feedbacks[index];
@@ -1482,7 +1734,81 @@ function thumbFeedback(index, dir) {
     upBtn.classList.toggle('active-up',   dir === 'up');
     downBtn.classList.toggle('active-down', dir === 'down');
     if (dir === 'up')   downBtn.classList.remove('active-down');
-    if (dir === 'down') upBtn.classList.remove('active-up');
+    if (dir === 'down') {
+      upBtn.classList.remove('active-up');
+      replaceCard(index);
+    }
+  }
+}
+
+async function replaceCard(index) {
+  const card = document.getElementById('thumb-down-' + index)?.closest('.suggestion-card');
+  const rejected = state.suggestions[index];
+  if (!card || !rejected) return;
+
+  // Lock against re-entry
+  card.dataset.replacing = '1';
+  card.style.pointerEvents = 'none';
+
+  // Fade-out via inline transition — no CSS class involved,
+  // so there's no `forwards`-fill snap-back when we clean up.
+  card.style.transition = 'opacity 0.2s ease-in, transform 0.2s ease-in';
+  card.style.opacity    = '0';
+  card.style.transform  = 'scale(0.93) translateY(6px)';
+
+  try {
+    const res = await fetch('/api/replace', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        setting:   state.setting,
+        context:   state.context,
+        url:       state.url || undefined,
+        style:     state.style,
+        humorType: state.humorType,
+        answers:   buildAnswersMap(),
+        type:      rejected.type,
+        rejected:  rejected.content,
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to fetch replacement');
+
+    state.suggestions[index] = data.suggestion;
+    delete state.feedbacks[index];
+
+    // Swap content while invisible
+    const contentEl = card.querySelector('.card-content');
+    if (contentEl) contentEl.textContent = data.suggestion.content;
+    document.getElementById('thumb-up-'   + index)?.classList.remove('active-up');
+    document.getElementById('thumb-down-' + index)?.classList.remove('active-down');
+
+    // Clear the inline fade-out styles (keep opacity:0 for now)
+    card.style.transition = '';
+    card.style.transform  = '';
+
+    // Add pop-in animation (starts at opacity:0 via fill:both),
+    // then one rAF later clear the inline opacity so the animation takes over.
+    // Both values are 0 at that moment — no visible jump.
+    card.classList.add('replaced');
+    requestAnimationFrame(() => {
+      card.style.opacity       = '';
+      card.style.pointerEvents = '';
+      delete card.dataset.replacing;
+      // .replaced is intentionally never removed — removing it would
+      // re-trigger the base `cardIn` animation on .suggestion-card.
+    });
+
+  } catch (err) {
+    // Graceful fade back in
+    card.style.transition    = 'opacity 0.3s ease-out, transform 0.3s ease-out';
+    card.style.opacity       = '';
+    card.style.transform     = '';
+    card.style.pointerEvents = '';
+    setTimeout(() => { card.style.transition = ''; }, 350);
+    delete card.dataset.replacing;
+    showToast('⚠️ ' + err.message);
   }
 }
 
@@ -1503,10 +1829,10 @@ async function copyContent(index) {
 
   const btn = document.getElementById('copy-' + index);
   btn.classList.add('copied');
-  btn.innerHTML = '<span class="icon">✅</span> Copied!';
+  btn.innerHTML = '✅ Copied!';
   setTimeout(() => {
     btn.classList.remove('copied');
-    btn.innerHTML = '<span class="icon">📋</span> Copy';
+    btn.innerHTML = '📋 Copy';
   }, 2000);
 
   showToast('Copied to clipboard!');

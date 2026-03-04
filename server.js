@@ -113,6 +113,8 @@ app.post('/api/generate', async (req, res) => {
     selfDeprecating: 'Self-deprecating humor that puts the joke firmly on the speaker — instantly disarming and relatable.',
     wordplay:        'Clever wordplay, puns, and double meanings — the more unexpected the twist the better.',
     oneLiners:       'Sharp punchy one-liners — maximum impact, minimum words. No long setup, just the hit.',
+    misdirect:       'Bait-and-switch humor — set up an obvious expectation, then pull the rug out with a completely unexpected punchline. The more surprising the pivot the better.',
+    popCulture:      'Riffs on current memes, trending pop culture, viral moments, or recent events. Keep references fresh and recognizable — the more timely and specific the better.',
   };
 
   let urlContext = '';
@@ -195,6 +197,85 @@ Respond with this exact JSON structure (5 ice breakers then 5 jokes):
   } catch (err) {
     console.error('[Generate Error]', err.message);
     res.status(500).json({ error: 'Something went wrong generating suggestions. Please try again.' });
+  }
+});
+
+// ── Replace a single thumbed-down suggestion ────────────────────────────
+app.post('/api/replace', async (req, res) => {
+  const { setting, context, url, style = 'neutral', humorType = 'balanced', answers, type, rejected } = req.body;
+
+  if (!setting || !context?.trim() || !type) {
+    return res.status(400).json({ error: 'setting, context and type are required.' });
+  }
+
+  const styleMap = {
+    formal:  'Polished, professional, and respectful — suitable for senior stakeholders.',
+    casual:  'Warm, relaxed, and friendly — like talking to a good friend.',
+    neutral: 'Balanced, approachable, and pleasant — broadly appropriate for most audiences.',
+  };
+
+  const humorMap = {
+    balanced:        'Warm, clever, and broadly appealing — funny without being too niche.',
+    dry:             'Deadpan and understated — the humor lives in what is NOT said.',
+    dad:             'Groan-worthy puns and dad jokes — the cornier the better.',
+    sarcastic:       'Sharp sarcasm with real bite — witty, ironic, and a little cutting.',
+    dark:            'Dark humor that finds comedy in the uncomfortable and absurd.',
+    selfDeprecating: 'Self-deprecating humor that puts the joke firmly on the speaker.',
+    wordplay:        'Clever wordplay, puns, and double meanings.',
+    oneLiners:       'Sharp punchy one-liners — maximum impact, minimum words.',
+    misdirect:       'Bait-and-switch — build an obvious expectation then yank the rug with a totally unexpected punchline.',
+    popCulture:      'Riffs on current memes, trending pop culture, viral moments, or recent events.',
+  };
+
+  let urlContext = '';
+  if (url?.trim()) {
+    const content = await tryFetchUrlContent(url.trim());
+    if (content) urlContext = `\n\nPresentation content: "${content}"`;
+  }
+
+  let answersContext = '';
+  if (answers && typeof answers === 'object') {
+    const lines = Object.entries(answers)
+      .filter(([, v]) => v?.trim())
+      .map(([q, a]) => `  • ${q}: ${a}`)
+      .join('\n');
+    if (lines) answersContext = `\n\nAudience context:\n${lines}`;
+  }
+
+  const rejectedNote = rejected
+    ? `\n\nThe user disliked this — do NOT repeat or closely resemble it:\n"${rejected}"`
+    : '';
+
+  const systemPrompt = `You are a sharp, witty social coach. Generate a single genuinely funny suggestion. Be ACTUALLY funny — specific, surprising, not generic. No content targeting protected characteristics or hate speech. Respond ONLY with valid JSON.`;
+
+  const userPrompt = `Generate exactly 1 fresh "${type}" for this situation.
+
+Setting: ${setting === 'work' ? 'WORK — Professional' : 'LIFESTYLE — Casual social'}
+Situation: ${context.trim()}${answersContext}${urlContext}
+Tone: ${styleMap[style] || styleMap.neutral}
+Humor Style: ${humorMap[humorType] || humorMap.balanced}${rejectedNote}
+
+JSON format: {"type": "${type}", "content": "..."}`;
+
+  try {
+    const message = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 300,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }],
+    });
+
+    const raw = message.content[0].text.trim();
+    const match = raw.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('Invalid response format');
+
+    const parsed = JSON.parse(match[0]);
+    if (!parsed.content) throw new Error('Missing content');
+
+    res.json({ suggestion: { type, content: parsed.content } });
+  } catch (err) {
+    console.error('[Replace Error]', err.message);
+    res.status(500).json({ error: 'Could not fetch replacement. Please try again.' });
   }
 });
 
